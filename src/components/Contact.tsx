@@ -67,7 +67,7 @@ export function Contact() {
               href={profile.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent hover:underline"
+              className="focus-ring rounded text-accent hover:underline"
             >
               LinkedIn
             </a>
@@ -77,7 +77,7 @@ export function Contact() {
               href={profile.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent hover:underline"
+              className="focus-ring rounded text-accent hover:underline"
             >
               GitHub
             </a>
@@ -87,7 +87,7 @@ export function Contact() {
               href={profile.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent hover:underline"
+              className="focus-ring rounded text-accent hover:underline"
             >
               WhatsApp
             </a>
@@ -104,7 +104,7 @@ export function Contact() {
               name="name"
               required
               minLength={2}
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+              className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
             />
           </div>
           <div>
@@ -116,7 +116,7 @@ export function Contact() {
               name="email"
               type="email"
               required
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+              className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
             />
           </div>
           <div>
@@ -129,14 +129,14 @@ export function Contact() {
               required
               minLength={10}
               rows={4}
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+              className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
             />
           </div>
 
           <button
             type="submit"
             disabled={status === "loading"}
-            className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="focus-ring rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {status === "loading" ? "Enviando..." : "Enviar mensagem"}
           </button>

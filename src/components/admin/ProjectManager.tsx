@@ -124,7 +124,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             required
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
@@ -134,7 +134,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             required
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
@@ -145,7 +145,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             rows={3}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
@@ -155,7 +155,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             value={form.imageUrl}
             onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
             placeholder="https://..."
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
@@ -165,7 +165,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             value={form.link}
             onChange={(e) => setForm({ ...form, link: e.target.value })}
             placeholder="https://..."
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
@@ -175,7 +175,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             type="number"
             value={form.order}
             onChange={(e) => setForm({ ...form, order: e.target.value })}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
+            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
@@ -185,7 +185,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="focus-ring rounded-full bg-accent px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {saving ? "Salvando..." : editingId ? "Salvar alterações" : "Adicionar projeto"}
           </button>
@@ -193,7 +193,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             <button
               type="button"
               onClick={cancelEdit}
-              className="rounded-full border border-border px-5 py-2 text-sm text-foreground"
+              className="focus-ring rounded-full border border-border px-5 py-2 text-sm text-foreground"
             >
               Cancelar
             </button>
@@ -220,13 +220,13 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             <div className="flex shrink-0 gap-2">
               <button
                 onClick={() => startEdit(project)}
-                className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground hover:border-accent"
+                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-foreground hover:border-accent"
               >
                 Editar
               </button>
               <button
                 onClick={() => handleDelete(project.id)}
-                className="rounded-full border border-border px-3 py-1.5 text-xs text-red-400 hover:border-red-400"
+                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-red-400 hover:border-red-400"
               >
                 Remover
               </button>

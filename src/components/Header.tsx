@@ -15,7 +15,7 @@ export function Header() {
       <div className="mx-auto flex max-w-content items-center justify-between px-6 py-4">
         <Link
           href="#"
-          className="flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3"
+          className="focus-ring flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -31,7 +31,7 @@ export function Header() {
             <a
               key={link.href}
               href={link.href}
-              className="transition-colors hover:text-foreground"
+              className="focus-ring rounded transition-colors hover:text-foreground"
             >
               {link.label}
             </a>

@@ -8,7 +8,7 @@ export function Footer() {
           © {new Date().getFullYear()} {profile.name}. Desenhado e codificado à mão.
         </p>
         <p>
-          <a href="/admin/login" className="hover:text-foreground">
+          <a href="/admin/login" className="focus-ring rounded hover:text-foreground">
             Área administrativa
           </a>
         </p>
