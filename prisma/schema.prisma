@@ -1,0 +1,40 @@
+// Schema do Prisma - define as tabelas do banco de dados.
+// Documentacao: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // SQLite para desenvolvimento local (zero configuracao).
+  // Para producao (ex: Vercel), troque para "postgresql" e aponte
+  // DATABASE_URL para um banco Postgres (Neon, Supabase, etc).
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  description String
+  imageUrl    String?
+  link        String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String // hash gerado com bcrypt, nunca texto puro
+}
