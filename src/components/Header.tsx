@@ -26,7 +26,7 @@ export function Header() {
           <span className="text-sm font-medium text-foreground">{profile.name}</span>
           <span className="h-2 w-2 rounded-full bg-accent" />
         </Link>
-        <nav className="hidden gap-6 text-sm text-muted sm:flex">
+        <nav aria-label="Navegação principal" className="hidden gap-6 text-sm text-muted sm:flex">
           {links.map((link) => (
             <a
               key={link.href}

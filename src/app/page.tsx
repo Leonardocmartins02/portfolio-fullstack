@@ -18,7 +18,7 @@ export default async function Home() {
   return (
     <>
       <Header />
-      <main>
+      <main id="main">
         <Hero />
         <Stats />
         <About />

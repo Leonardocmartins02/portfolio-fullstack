@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <main className="mx-auto max-w-content px-6 py-12">
+    <main id="main" className="mx-auto max-w-content px-6 py-12">
       <div className="mb-10 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Painel administrativo</h1>
