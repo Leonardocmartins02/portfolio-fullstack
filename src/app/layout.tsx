@@ -8,10 +8,26 @@ const inter = Inter({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+const title = "Leonardo Martins — Portfólio";
+const description =
+  "Portfólio de Leonardo Martins, desenvolvedor full stack — projetos, trajetória e contato.";
+
 export const metadata: Metadata = {
-  title: "Leonardo Martins — Portfólio",
-  description:
-    "Portfólio de Leonardo Martins, desenvolvedor full stack — projetos, trajetória e contato.",
+  metadataBase: new URL(siteUrl),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
