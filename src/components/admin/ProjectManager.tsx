@@ -138,8 +138,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         </h3>
 
         <div>
-          <label className="mb-1 block text-xs text-muted">Título</label>
+          <label htmlFor="project-title" className="mb-1 block text-xs text-muted">
+            Título
+          </label>
           <input
+            id="project-title"
             required
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -148,8 +151,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-muted">Categoria</label>
+          <label htmlFor="project-category" className="mb-1 block text-xs text-muted">
+            Categoria
+          </label>
           <input
+            id="project-category"
             required
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -158,8 +164,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-muted">Descrição</label>
+          <label htmlFor="project-description" className="mb-1 block text-xs text-muted">
+            Descrição
+          </label>
           <textarea
+            id="project-description"
             required
             rows={3}
             value={form.description}
@@ -169,8 +178,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-muted">Imagem (URL, opcional)</label>
+          <label htmlFor="project-image" className="mb-1 block text-xs text-muted">
+            Imagem (URL, opcional)
+          </label>
           <input
+            id="project-image"
             value={form.imageUrl}
             onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
             placeholder="https://..."
@@ -179,8 +191,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-muted">Link do projeto (opcional)</label>
+          <label htmlFor="project-link" className="mb-1 block text-xs text-muted">
+            Link do projeto (opcional)
+          </label>
           <input
+            id="project-link"
             value={form.link}
             onChange={(e) => setForm({ ...form, link: e.target.value })}
             placeholder="https://..."
@@ -189,8 +204,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
         </div>
 
         <div>
-          <label className="mb-1 block text-xs text-muted">Ordem de exibição</label>
+          <label htmlFor="project-order" className="mb-1 block text-xs text-muted">
+            Ordem de exibição
+          </label>
           <input
+            id="project-order"
             type="number"
             value={form.order}
             onChange={(e) => setForm({ ...form, order: e.target.value })}
@@ -198,7 +216,11 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
           />
         </div>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && (
+          <p role="alert" aria-live="assertive" className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         <div className="flex gap-3 pt-2">
           <button
