@@ -9,13 +9,13 @@ export function MessagesList({ messages }: { messages: ContactMessage[] }) {
     <div className="space-y-4">
       {messages.map((message) => (
         <div key={message.id} className="rounded-2xl border border-border bg-surface p-4">
-          <div className="flex items-center justify-between text-xs text-muted">
+          <div className="flex flex-wrap items-center justify-between gap-1 text-xs text-muted">
             <span>
               {message.name} · {message.email}
             </span>
             <span>{new Date(message.createdAt).toLocaleString("pt-BR")}</span>
           </div>
-          <p className="mt-2 text-sm text-foreground/90">{message.message}</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">{message.message}</p>
         </div>
       ))}
     </div>
