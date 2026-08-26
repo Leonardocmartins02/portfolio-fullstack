@@ -48,6 +48,7 @@ export default function AdminLoginPage() {
             name="email"
             type="email"
             required
+            autoComplete="email"
             className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
@@ -60,11 +61,16 @@ export default function AdminLoginPage() {
             name="password"
             type="password"
             required
+            autoComplete="current-password"
             className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && (
+          <p role="alert" aria-live="assertive" className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
