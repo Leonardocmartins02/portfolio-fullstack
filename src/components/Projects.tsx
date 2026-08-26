@@ -8,7 +8,7 @@ export function Projects({ projects }: { projects: Project[] }) {
         Projetos selecionados
       </span>
       <h2 className="mb-6 mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
-        O que já construí
+        Estou construindo
       </h2>
 
       {projects.length === 0 ? (

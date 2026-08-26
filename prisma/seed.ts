@@ -28,21 +28,30 @@ async function main() {
     await prisma.project.createMany({
       data: [
         {
-          title: "Sistema de Agendamento de Salas",
+          title: "Portfólio full stack",
           category: "Full Stack",
           description:
-            "Aplicacao web full-stack para gerenciamento e reserva de salas universitarias: cadastro, autenticacao e reserva com validacoes, backend em Python (Flask) e banco de dados relacional (SQLite) para controle de disponibilidade e horarios.",
+            "Este portfolio: Next.js 14, TypeScript, Tailwind, Prisma e NextAuth, com painel administrativo proprio e formulario de contato integrado.",
           imageUrl: "",
-          link: "https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas",
+          link: "https://github.com/Leonardocmartins02/portfolio-fullstack",
+          order: 0,
+        },
+        {
+          title: "Sistema de estoque",
+          category: "Full Stack",
+          description:
+            "Monorepo para gestao de estoque com backend, frontend e pacotes compartilhados em TypeScript, usando Prisma no acesso a dados.",
+          imageUrl: "",
+          link: "https://github.com/Leonardocmartins02/Sistema-Estoque-main",
           order: 1,
         },
         {
-          title: "SimpleStock — Controle de Estoque",
-          category: "Web",
+          title: "Agendamento de salas",
+          category: "Backend",
           description:
-            "Sistema de gerenciamento de inventario, com registro de movimentacoes e historico de produtos. Desenvolvimento priorizando responsividade, conversao de imagens para WebP, praticas modernas de acessibilidade (ARIA labels) e otimizacao de performance.",
+            "Aplicacao web para gerenciar reservas de salas em uma universidade, com backend em Flask e SQLAlchemy e frontend em HTML, CSS e JavaScript.",
           imageUrl: "",
-          link: "https://github.com/Leonardocmartins02/Sistema-Estoque",
+          link: "https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas",
           order: 2,
         },
       ],
