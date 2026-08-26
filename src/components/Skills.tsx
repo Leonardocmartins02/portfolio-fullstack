@@ -6,7 +6,7 @@ export function Skills() {
       <h2 className="mb-6 text-sm font-medium uppercase tracking-widest text-accent">
         Skills &amp; Ferramentas
       </h2>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {skills.map((group) => (
           <div
             key={group.group}
@@ -15,16 +15,16 @@ export function Skills() {
             <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-muted">
               {group.group}
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <ul className="flex flex-wrap gap-2">
               {group.items.map((item) => (
-                <span
+                <li
                   key={item}
-                  className="rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-foreground/90"
+                  className="rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:border-accent/60"
                 >
                   {item}
-                </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         ))}
       </div>
