@@ -234,7 +234,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             <button
               type="button"
               onClick={cancelEdit}
-              className="focus-ring rounded-full border border-border px-5 py-2 text-sm text-foreground"
+              className="focus-ring rounded-full border border-border px-5 py-2 text-sm text-foreground transition-colors hover:bg-surface"
             >
               Cancelar
             </button>
@@ -262,14 +262,14 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
               <button
                 onClick={() => startEdit(project)}
                 disabled={deletingId === project.id}
-                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-foreground hover:border-accent disabled:opacity-50"
+                className="focus-ring rounded-full border border-border px-3 py-2 text-xs text-foreground transition-colors hover:border-accent disabled:opacity-50"
               >
                 Editar
               </button>
               <button
                 onClick={() => handleDelete(project.id)}
                 disabled={deletingId === project.id}
-                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-red-400 hover:border-red-400 disabled:opacity-50"
+                className="focus-ring rounded-full border border-border px-3 py-2 text-xs text-red-400 transition-colors hover:border-red-400 disabled:opacity-50"
               >
                 {deletingId === project.id ? "Removendo..." : "Remover"}
               </button>
