@@ -104,7 +104,11 @@ export function Contact() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          aria-busy={status === "loading"}
+          className="space-y-4"
+        >
           <div>
             <label htmlFor="name" className="mb-1 block text-xs text-muted">
               Nome <span aria-hidden="true">*</span>
@@ -179,8 +183,14 @@ export function Contact() {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="focus-ring rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="focus-ring inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
+            {status === "loading" && (
+              <span
+                aria-hidden="true"
+                className="h-3 w-3 animate-spin rounded-full border-2 border-background/30 border-t-background"
+              />
+            )}
             {status === "loading" ? "Enviando..." : "Enviar mensagem"}
           </button>
 
