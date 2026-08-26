@@ -28,3 +28,19 @@ body {
   outline: 2px solid #7c6cf6;
   outline-offset: 2px;
 }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}

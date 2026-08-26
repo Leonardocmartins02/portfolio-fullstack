@@ -9,6 +9,7 @@ import { Projects } from "@/components/Projects";
 import { Timeline } from "@/components/Timeline";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 // Server Component: busca os projetos direto no banco a cada carregamento.
 // Se o banco falhar, degrada para lista vazia em vez de derrubar a home inteira.
@@ -28,11 +29,21 @@ export default async function Home() {
       <main id="main">
         <Hero />
         <Stats />
-        <About />
-        <Skills />
-        <Projects projects={projects} />
-        <Timeline />
-        <Contact />
+        <ScrollReveal>
+          <About />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Skills />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Projects projects={projects} />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Timeline />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Contact />
+        </ScrollReveal>
       </main>
       <Footer />
     </>

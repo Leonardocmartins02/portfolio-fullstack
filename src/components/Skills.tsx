@@ -3,8 +3,11 @@ import { skills } from "@/lib/data";
 export function Skills() {
   return (
     <section id="skills" className="mx-auto max-w-content px-6 py-16">
-      <h2 className="mb-6 text-sm font-medium uppercase tracking-widest text-accent">
+      <span className="text-sm font-medium uppercase tracking-widest text-accent">
         Skills &amp; Ferramentas
+      </span>
+      <h2 className="mb-6 mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
+        Ferramentas e tecnologias
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {skills.map((group) => (
