@@ -17,7 +17,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <main id="main" className="mx-auto max-w-content px-6 py-12">
-      <div className="mb-10 flex items-center justify-between">
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Painel administrativo</h1>
           <p className="text-sm text-muted">Logado como {session?.user?.email}</p>
