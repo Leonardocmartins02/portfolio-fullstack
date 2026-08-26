@@ -185,7 +185,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
           <button
             type="submit"
             disabled={saving}
-            className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {saving ? "Salvando..." : editingId ? "Salvar alterações" : "Adicionar projeto"}
           </button>

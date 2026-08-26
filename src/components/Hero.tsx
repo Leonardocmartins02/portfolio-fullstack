@@ -15,7 +15,7 @@ export function Hero() {
       <div className="flex gap-4 pt-2">
         <a
           href="#projetos"
-          className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          className="rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
         >
           Ver projetos
         </a>
