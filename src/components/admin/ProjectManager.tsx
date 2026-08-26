@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import type { Project } from "@prisma/client";
 
 type FormState = {
@@ -27,6 +27,8 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const deletingRef = useRef<string | null>(null);
 
   function startEdit(project: Project) {
     setEditingId(project.id);
@@ -98,13 +100,30 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
   }
 
   async function handleDelete(id: string) {
+    if (deletingRef.current) return;
+
     const confirmed = window.confirm("Remover este projeto?");
     if (!confirmed) return;
 
-    const response = await fetch(`/api/projects/${id}`, { method: "DELETE" });
-    if (response.ok) {
+    if (deletingRef.current) return;
+    deletingRef.current = id;
+    setDeletingId(id);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body?.error ?? "Erro ao remover o projeto.");
+      }
+
       setProjects((prev) => prev.filter((project) => project.id !== id));
       if (editingId === id) cancelEdit();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
+      deletingRef.current = null;
+      setDeletingId(null);
     }
   }
 
@@ -220,15 +239,17 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             <div className="flex shrink-0 gap-2">
               <button
                 onClick={() => startEdit(project)}
-                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-foreground hover:border-accent"
+                disabled={deletingId === project.id}
+                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-foreground hover:border-accent disabled:opacity-50"
               >
                 Editar
               </button>
               <button
                 onClick={() => handleDelete(project.id)}
-                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-red-400 hover:border-red-400"
+                disabled={deletingId === project.id}
+                className="focus-ring rounded-full border border-border px-3 py-1.5 text-xs text-red-400 hover:border-red-400 disabled:opacity-50"
               >
-                Remover
+                {deletingId === project.id ? "Removendo..." : "Remover"}
               </button>
             </div>
           </div>
