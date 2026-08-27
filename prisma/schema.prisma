@@ -6,10 +6,7 @@ generator client {
 }
 
 datasource db {
-  // SQLite para desenvolvimento local (zero configuracao).
-  // Para producao (ex: Vercel), troque para "postgresql" e aponte
-  // DATABASE_URL para um banco Postgres (Neon, Supabase, etc).
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
