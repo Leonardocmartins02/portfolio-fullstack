@@ -6,12 +6,18 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// So aceita http/https - bloqueia esquemas perigosos como javascript:, data:, ftp:.
+const httpUrl = z
+  .string()
+  .url()
+  .refine((value) => /^https?:\/\//i.test(value), "URL deve comecar com http:// ou https://");
+
 const projectUpdateSchema = z.object({
   title: z.string().min(2).max(160).optional(),
   category: z.string().min(2).max(60).optional(),
   description: z.string().min(10).max(2000).optional(),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  link: z.string().url().optional().or(z.literal("")),
+  imageUrl: httpUrl.optional().or(z.literal("")),
+  link: httpUrl.optional().or(z.literal("")),
   order: z.number().int().optional(),
 });
 

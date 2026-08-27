@@ -11,6 +11,10 @@ const contactSchema = z.object({
   message: z.string().min(10, "Mensagem muito curta").max(4000),
 });
 
+// Janela minima entre duas mensagens do mesmo e-mail, para conter spam do
+// formulario publico sem depender de um servico externo de rate limiting.
+const RATE_LIMIT_WINDOW_MS = 60_000;
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -24,6 +28,19 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "Dados invalidos", details: parsed.error.flatten().fieldErrors },
       { status: 400 }
+    );
+  }
+
+  const recentMessage = await prisma.contactMessage.findFirst({
+    where: {
+      email: parsed.data.email,
+      createdAt: { gte: new Date(Date.now() - RATE_LIMIT_WINDOW_MS) },
+    },
+  });
+  if (recentMessage) {
+    return NextResponse.json(
+      { error: "Aguarde um pouco antes de enviar outra mensagem." },
+      { status: 429 }
     );
   }
 
