@@ -32,7 +32,7 @@ export const skills = [
   },
   {
     group: "Infraestrutura & Suporte",
-    items: ["Linux (Ubuntu)", "Windows", "Redes (LAN/Wi-Fi)", "Active Directory", "Figma"],
+    items: ["Linux (Ubuntu)", "Windows", "Redes (LAN/Wi-Fi)", "Active Directory", "Diagnóstico e Manutenção de Impressoras", "Figma"],
   },
 ];
 
