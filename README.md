@@ -1,27 +1,38 @@
 # Portfólio Full Stack
 
-Projeto de prática full stack: um site de portfólio pessoal (inspirado em layouts
-minimalistas escuros) com um back-end real por trás — banco de dados, formulário
-de contato funcional e um painel administrativo com login para gerenciar os
-projetos exibidos, sem precisar mexer no código.
+🔗 **Demo ao vivo:** [portfolio-fullstack-delta-seven.vercel.app](https://portfolio-fullstack-delta-seven.vercel.app)
+
+Site de portfólio pessoal com um back-end real por trás: banco de dados, formulário de contato funcional (com notificação por e-mail) e um painel administrativo com login para gerenciar os projetos exibidos — sem precisar mexer em código.
+
+![Home do portfólio](docs/screenshot-hero.png)
 
 ## Stack
 
-- **Next.js 14** (App Router) + **TypeScript**
-- **Tailwind CSS** para estilização
-- **Prisma** + **SQLite** (dev) como ORM/banco de dados
-- **NextAuth (Auth.js v4)** com login por email/senha para a área admin
-- **Zod** para validação de dados nas rotas de API
+| Camada | Tecnologias |
+|---|---|
+| Front-end | Next.js 14 (App Router) · TypeScript · Tailwind CSS |
+| Back-end | API Routes do Next.js · Zod (validação) |
+| Banco de dados | PostgreSQL (Neon) via Prisma ORM |
+| Autenticação | NextAuth (Auth.js v4) — Credentials Provider + bcrypt |
+| E-mail | Resend (API HTTP) |
+| Deploy | Vercel, com CI/CD automático a cada push no `master` |
 
-## ⚠️ Aviso importante
+## Funcionalidades
 
-Este projeto foi escrito à mão em um ambiente sem acesso à internet (não foi
-possível rodar `npm install` nem testar o build). O código segue os padrões
-oficiais do Next.js/Prisma/NextAuth, mas **rode os passos abaixo com atenção**
-e, se encontrar algum erro ao instalar ou rodar, me mande a mensagem completa
-do erro que eu corrijo.
+- **Site público** com seções de apresentação, skills, trajetória profissional, projetos e contato.
+- **Projetos dinâmicos**: cadastrados via banco de dados, não hardcoded — o admin gerencia tudo pelo painel.
+- **Painel administrativo protegido** (`/admin/dashboard`): CRUD completo de projetos e visualização das mensagens recebidas pelo formulário de contato.
+- **Formulário de contato resiliente**: toda mensagem é salva no banco mesmo se o envio de e-mail falhar, e o usuário recebe um status honesto sobre o que realmente aconteceu.
+- **Autenticação segura**: sessão JWT, senha com hash bcrypt, rotas de mutação protegidas por `getServerSession`.
 
-## Como rodar localmente
+## Projetos em destaque
+
+| Projeto | Descrição |
+|---|---|
+| [Sistema de estoque](https://github.com/Leonardocmartins02/Sistema-Estoque-main) | Monorepo de gestão de estoque (SimpleStock) — cadastro de produtos, controle de saldo e movimentações. |
+| [Agendamento de salas](https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas) | Reserva de salas para uma universidade — backend em Flask/SQLAlchemy. |
+
+## Rodando localmente
 
 ### 1. Instalar dependências
 
@@ -31,140 +42,75 @@ npm install
 
 ### 2. Configurar variáveis de ambiente
 
-Copie o arquivo de exemplo e ajuste se quiser:
-
 ```bash
 cp .env.example .env
 ```
 
-Gere um valor aleatório para `NEXTAUTH_SECRET` (necessário para o login funcionar):
+Gere um valor aleatório para `NEXTAUTH_SECRET`:
 
 ```bash
 openssl rand -base64 32
 ```
 
-Cole o resultado no `.env`, no campo `NEXTAUTH_SECRET`.
-
-### 3. Criar o banco de dados
+### 3. Banco de dados
 
 ```bash
-npm run db:push
+npm run db:push   # cria as tabelas a partir de prisma/schema.prisma
+npm run db:seed   # cria o usuario admin e projetos de exemplo
 ```
 
-Isso cria o arquivo `dev.db` (SQLite) com as tabelas definidas em
-`prisma/schema.prisma`.
+> O projeto usa PostgreSQL (recomendado: um banco gratuito no [Neon](https://neon.tech)). Aponte `DATABASE_URL` para ele tanto em desenvolvimento quanto em produção.
 
-### 4. Popular dados iniciais (usuário admin + projetos de exemplo)
-
-```bash
-npm run db:seed
-```
-
-Isso cria um usuário administrador com o email/senha definidos em `.env`
-(`ADMIN_EMAIL` / `ADMIN_PASSWORD`, padrão: `admin@example.com` / `mudeesta123`)
-e três projetos de exemplo.
-
-### 5. Rodar o projeto
+### 4. Rodar
 
 ```bash
 npm run dev
 ```
 
-Acesse:
+- Site público: `http://localhost:3000`
+- Login admin: `http://localhost:3000/admin/login`
+- Painel admin: `http://localhost:3000/admin/dashboard`
 
-- **Site público:** http://localhost:3000
-- **Login admin:** http://localhost:3000/admin/login
-- **Painel admin:** http://localhost:3000/admin/dashboard (após login)
+## Notificação por e-mail do formulário de contato
 
-## Configurar o e-mail de notificação do formulário de contato
+Toda mensagem do formulário de contato é sempre salva no banco (visível em `/admin/dashboard`). Para também receber um e-mail de aviso, configure o [Resend](https://resend.com) no `.env`:
 
-Quando alguém preenche o formulário de contato, a mensagem **sempre** é salva no
-banco de dados (visível em `/admin/dashboard`). Para também receber um e-mail
-avisando, configure o [Resend](https://resend.com) no `.env`.
+```env
+RESEND_API_KEY="re_sua_chave_aqui"
+EMAIL_FROM="Portfolio <onboarding@resend.dev>"
+EMAIL_TO="seuemail@exemplo.com"
+```
 
-> **Por que não SMTP do Hotmail/Outlook?** A Microsoft desativou
-> permanentemente a autenticação básica (usuário + senha, inclusive senha de
-> aplicativo) no SMTP das contas pessoais Outlook.com/Hotmail. Qualquer
-> tentativa retorna `535 5.7.139 Authentication unsuccessful, basic
-> authentication is disabled`, e isso **não pode ser reativado** por conta.
-> Por isso o projeto usa a API HTTP do Resend.
-
-1. Crie uma conta gratuita em [resend.com](https://resend.com) (3.000 e-mails
-   por mês no plano free), usando o e-mail que vai **receber** as notificações.
-2. Vá em **API Keys → Create API Key** e copie a chave (começa com `re_`).
-3. No `.env`, preencha:
-
-   ```env
-   RESEND_API_KEY="re_sua_chave_aqui"
-   EMAIL_FROM="Portfolio <onboarding@resend.dev>"
-   EMAIL_TO="seuemail@hotmail.com"
-   ```
-
-4. Reinicie o `npm run dev` e envie uma mensagem pelo formulário.
-
-**Sobre o `EMAIL_FROM`:** sem um domínio próprio verificado, o Resend só
-permite enviar a partir de `onboarding@resend.dev` e **somente para o e-mail
-dono da conta Resend**. Se um dia você verificar um domínio seu, troque o
-`EMAIL_FROM` para um endereço desse domínio e o `EMAIL_TO` fica livre.
-
-**Se não configurar nada disso:** o formulário continua funcionando e salvando
-as mensagens no painel admin — apenas não chega e-mail, e o visitante recebe um
-aviso claro de que a notificação falhou (nada de sucesso falso).
+> **Por que não SMTP do Outlook/Hotmail?** A Microsoft desativou permanentemente a autenticação básica no SMTP de contas pessoais Outlook.com/Hotmail — qualquer tentativa retorna `535 5.7.139`. Por isso o envio usa a API HTTP do Resend.
 
 ## Personalizando o conteúdo
 
-- **Seus dados pessoais** (nome, bio, links, skills, trajetória): edite
-  `src/lib/data.ts`.
-- **Cores/tema:** edite `tailwind.config.ts` (a paleta escura já está
-  configurada, inspirada em um layout minimalista com fundo `#07060D`).
-- **Projetos:** não edite código — use o painel admin
-  (`/admin/dashboard`) para adicionar, editar e remover projetos. Eles ficam
-  salvos no banco de dados.
+- **Dados pessoais** (nome, bio, links, skills, trajetória): `src/lib/data.ts`.
+- **Tema/cores**: `tailwind.config.ts`.
+- **Projetos**: não edite código — use o painel admin (`/admin/dashboard`).
 
 ## Estrutura do projeto
 
 ```
 src/
   app/
-    page.tsx              -> página pública (monta todas as seções)
-    layout.tsx             -> layout raiz (fonte, tema escuro)
-    admin/login/           -> página de login
-    admin/dashboard/       -> painel admin (protegido)
-    api/contact/           -> API do formulário de contato
-    api/projects/          -> API de CRUD de projetos
-    api/auth/[...nextauth] -> rota do NextAuth
-  components/               -> seções da página pública (Hero, About, etc)
-  components/admin/         -> componentes do painel admin
-  lib/prisma.ts             -> cliente do Prisma (singleton)
-  lib/auth.ts               -> configuração do NextAuth
-  lib/data.ts                -> conteúdo estático editável (seu perfil)
-  middleware.ts               -> protege as rotas /admin/dashboard
+    page.tsx               -> pagina publica (monta todas as secoes)
+    admin/login/            -> pagina de login
+    admin/dashboard/        -> painel admin (protegido)
+    api/contact/            -> API do formulario de contato
+    api/projects/            -> API de CRUD de projetos
+    api/auth/[...nextauth]  -> rota do NextAuth
+  components/                -> secoes da pagina publica (Hero, About, etc)
+  components/admin/          -> componentes do painel admin
+  lib/prisma.ts               -> cliente do Prisma (singleton)
+  lib/auth.ts                 -> configuracao do NextAuth
+  lib/data.ts                 -> conteudo estatico editavel (perfil)
+  middleware.ts                -> protege as rotas /admin/dashboard
 prisma/
-  schema.prisma              -> modelos do banco (Project, ContactMessage, Admin)
-  seed.ts                     -> script de dados iniciais
+  schema.prisma                -> modelos do banco (Project, ContactMessage, Admin)
+  seed.ts                       -> script de dados iniciais
 ```
 
-## Publicando (deploy)
+## Deploy
 
-O SQLite não funciona bem em produção na Vercel (sistema de arquivos é
-temporário). Para publicar:
-
-1. Crie um banco Postgres gratuito (ex: [Neon](https://neon.tech) ou
-   [Supabase](https://supabase.com)).
-2. Em `prisma/schema.prisma`, troque `provider = "sqlite"` por
-   `provider = "postgresql"`.
-3. Configure a variável `DATABASE_URL` na Vercel com a connection string do
-   Postgres.
-4. Configure também `NEXTAUTH_SECRET`, `NEXTAUTH_URL` (a URL de produção),
-   `ADMIN_EMAIL` e `ADMIN_PASSWORD` nas variáveis de ambiente da Vercel.
-5. Rode `npx prisma db push` apontando para o banco de produção (ou configure
-   isso no passo de build) e depois `npm run db:seed` uma vez para criar o
-   admin.
-6. Faça o deploy normalmente (conectando o repositório à Vercel).
-
-## Próximos passos sugeridos
-
-- Trocar a imagem estática dos projetos por upload real (ex: usando um
-  serviço como Cloudinary ou Vercel Blob).
-- Adicionar paginação/categoria de filtro na seção de projetos.
-- Adicionar testes automatizados para as rotas de API.
+Já publicado na Vercel com integração contínua ao GitHub — cada push no `master` gera um novo deploy automaticamente. O banco de produção é PostgreSQL (Neon), configurado via `DATABASE_URL` nas variáveis de ambiente da Vercel.
