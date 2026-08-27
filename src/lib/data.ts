@@ -38,7 +38,7 @@ export const skills = [
 
 export const timeline = [
   {
-    year: "set/2025 – Atual",
+    year: "set/2026 – Atual",
     title: "Analista de Suporte de TI — Elo Infraestrutura",
     description:
       "Suporte técnico N1/N2, gestão de infraestrutura de redes, administração de acessos e rotinas de backup, controle de ativos e documentação técnica.",
