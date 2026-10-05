@@ -24,11 +24,15 @@ export const stats = [
 export const skills = [
   {
     group: "Front-end",
-    items: ["React", "JavaScript (ES6+)", "HTML5", "CSS3", "Tailwind CSS", "Design Responsivo"],
+    items: ["React", "TypeScript", "TanStack Query", "JavaScript (ES6+)", "HTML5", "CSS3", "Tailwind CSS", "Design Responsivo", "Acessibilidade (WCAG)"],
   },
   {
     group: "Back-end",
-    items: ["Python (Flask)", "Node.js", "SQL (SQLite/SQLAlchemy)", "Git/GitHub"],
+    items: ["Python (Flask)", "Node.js", "Supabase (Auth, Storage, Edge Functions)", "PostgreSQL (RLS, funções transacionais)", "SQL (SQLite/SQLAlchemy)", "Controle de concorrência", "LGPD", "Git/GitHub"],
+  },
+  {
+    group: "Qualidade & Deploy",
+    items: ["Playwright (E2E)", "Vitest", "axe (auditoria de acessibilidade)", "GitHub Actions (CI)", "Cloudflare Pages"],
   },
   {
     group: "Infraestrutura & Suporte",
