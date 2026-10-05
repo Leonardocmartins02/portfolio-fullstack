@@ -11,7 +11,11 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
-// Server Component: busca os projetos direto no banco a cada carregamento.
+// Revalida a pagina a cada 60s: sem isso o Next gera a home so no deploy e
+// projetos cadastrados no painel nao aparecem ate o proximo redeploy.
+export const revalidate = 60;
+
+// Server Component: busca os projetos direto no banco.
 // Se o banco falhar, degrada para lista vazia em vez de derrubar a home inteira.
 export default async function Home() {
   let projects: Project[] = [];
