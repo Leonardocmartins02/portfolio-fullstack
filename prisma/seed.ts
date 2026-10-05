@@ -54,6 +54,15 @@ async function main() {
           link: "https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas",
           order: 2,
         },
+        {
+          title: "chadbb: organizador de chá de bebê",
+          category: "Full Stack",
+          description:
+            "Convites por link no WhatsApp, confirmação de presença e reserva de fraldas e mimos pelo celular, sem conta. Em produção para um evento real, com React, TypeScript, Supabase (Postgres com RLS e funções transacionais) e Cloudflare Pages, 678 testes E2E e auditoria de acessibilidade com axe.",
+          imageUrl: "/projects/chadbb.png",
+          link: "https://chadbb.online/",
+          order: 3,
+        },
       ],
     });
     console.log("Projetos de exemplo criados.");
