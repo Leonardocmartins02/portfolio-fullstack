@@ -20,10 +20,14 @@ Site de portfólio pessoal com um back-end real por trás: banco de dados, formu
 ## Funcionalidades
 
 - **Site público** com seções de apresentação, skills, trajetória profissional, projetos e contato.
-- **Projetos dinâmicos**: cadastrados via banco de dados, não hardcoded — o admin gerencia tudo pelo painel.
+- **Projetos complementares**: cadastrados via banco de dados e gerenciados pelo painel, com uma apresentação editorial dedicada ao SimpleStock.
 - **Painel administrativo protegido** (`/admin/dashboard`): CRUD completo de projetos e visualização das mensagens recebidas pelo formulário de contato.
 - **Formulário de contato resiliente**: toda mensagem é salva no banco mesmo se o envio de e-mail falhar, e o usuário recebe um status honesto sobre o que realmente aconteceu.
 - **Autenticação segura**: sessão JWT, senha com hash bcrypt, rotas de mutação protegidas por `getServerSession`.
+
+## Projeto principal
+
+O SimpleStock tem uma apresentação dedicada em [`/projetos/simplestock`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/simplestock), com vídeo do fluxo real, captura de tela e decisões técnicas. O destaque editorial fica em `src/components/Projects.tsx`; os demais projetos continuam vindo do painel administrativo. O destaque permanece disponível mesmo quando a consulta ao banco falha.
 
 ## Projetos em destaque
 
@@ -87,7 +91,7 @@ EMAIL_TO="seuemail@exemplo.com"
 
 - **Dados pessoais** (nome, bio, links, skills, trajetória): `src/lib/data.ts`.
 - **Tema/cores**: `tailwind.config.ts`.
-- **Projetos**: não edite código — use o painel admin (`/admin/dashboard`).
+- **Projetos complementares**: use o painel admin (`/admin/dashboard`). O destaque e a demonstração do SimpleStock ficam em `src/components/Projects.tsx` e `src/app/projetos/simplestock/page.tsx`.
 
 ## Estrutura do projeto
 
