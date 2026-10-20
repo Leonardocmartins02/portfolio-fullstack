@@ -19,10 +19,10 @@ export function Projects({ projects }: { projects: Project[] }) {
 
       <article className="mb-8 overflow-hidden rounded-2xl border border-accent/40 bg-surface lg:grid lg:grid-cols-2">
         <Image
-          src="/projects/simplestock-dashboard.png"
-          alt="SimpleStock: lista de produtos, saldos e alertas de estoque"
+          src="/projects/simplestock-v2-dashboard.png"
+          alt="SimpleStock: dashboard da nova interface com indicadores, evolução do estoque e produtos para repor"
           width={1440}
-          height={1080}
+          height={900}
           className="h-auto w-full self-center"
         />
         <div className="p-6 sm:p-8">
