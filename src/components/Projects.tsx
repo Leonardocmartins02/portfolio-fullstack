@@ -4,9 +4,12 @@ import type { Project } from "@prisma/client";
 
 export function Projects({ projects }: { projects: Project[] }) {
   const stockRepository = "https://github.com/Leonardocmartins02/Sistema-Estoque-main";
-  const otherProjects = projects.filter(
-    (project) => project.link?.replace(/\.git$|\/$/g, "") !== stockRepository,
-  );
+  const perolRepository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
+  // Projetos com apresentação própria no código não se repetem na lista que vem do banco.
+  const otherProjects = projects.filter((project) => {
+    const link = project.link?.replace(/\.git$|\/$/g, "");
+    return link !== stockRepository && link !== perolRepository;
+  });
 
   return (
     <section id="projetos" className="mx-auto max-w-content px-6 py-16">
@@ -46,52 +49,86 @@ export function Projects({ projects }: { projects: Project[] }) {
         </div>
       </article>
 
-      {otherProjects.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {otherProjects.map((project) => (
-            <article
-              key={project.id}
-              className="overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/60"
-            >
-              {project.imageUrl ? (
-                <Image
-                  src={project.imageUrl}
-                  alt={project.title}
-                  width={640}
-                  height={176}
-                  className="h-44 w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-44 w-full items-center justify-center bg-surface/60 text-xs text-muted">
-                  Sem imagem
-                </div>
-              )}
-              <div className="p-6">
-                <span className="text-xs font-medium uppercase tracking-wide text-accent">
-                  {project.category}
-                </span>
-                <h3 className="mt-2 text-lg font-semibold text-foreground">
-                  {project.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  {project.description}
-                </p>
-                {project.link ? (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${project.link.startsWith("https://github.com/") ? "Ver código" : "Ver demonstração"}: ${project.title}`}
-                    className="focus-ring mt-4 inline-block rounded text-sm font-medium text-accent hover:underline"
-                  >
-                    {project.link.startsWith("https://github.com/") ? "Ver código ↗" : "Ver demonstração ↗"}
-                  </a>
-                ) : null}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <article className="overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/60">
+          <Image
+            src="/projects/perol-compra.png"
+            alt="Landing page Perol: galeria do F5 Flotador, seletor de volume e kits"
+            width={640}
+            height={176}
+            className="h-44 w-full object-cover"
+          />
+          <div className="p-6">
+            <span className="text-xs font-medium uppercase tracking-wide text-accent">
+              Landing page · Front-end
+            </span>
+            <h3 className="mt-2 text-lg font-semibold text-foreground">
+              Perol: landing page de produtos de limpeza
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Página de venda do F5 Flotador e do Lavix para campanhas de anúncio: troca de
+              produto, galeria por volume, kits com preço por litro e guia por ambiente. Fiz o
+              código; as artes são de um parceiro. React, TanStack Start e Tailwind CSS.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-4">
+              <Link href="/projetos/perol" className="focus-ring rounded text-sm font-medium text-accent hover:underline">
+                Ver demonstração →
+              </Link>
+              <a
+                href={perolRepository}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ver código: Perol"
+                className="focus-ring rounded text-sm font-medium text-accent hover:underline"
+              >
+                Ver código ↗
+              </a>
+            </div>
+          </div>
+        </article>
+        {otherProjects.map((project) => (
+          <article
+            key={project.id}
+            className="overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/60"
+          >
+            {project.imageUrl ? (
+              <Image
+                src={project.imageUrl}
+                alt={project.title}
+                width={640}
+                height={176}
+                className="h-44 w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-44 w-full items-center justify-center bg-surface/60 text-xs text-muted">
+                Sem imagem
               </div>
-            </article>
-          ))}
-        </div>
-      ) : null}
+            )}
+            <div className="p-6">
+              <span className="text-xs font-medium uppercase tracking-wide text-accent">
+                {project.category}
+              </span>
+              <h3 className="mt-2 text-lg font-semibold text-foreground">
+                {project.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                {project.description}
+              </p>
+              {project.link ? (
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${project.link.startsWith("https://github.com/") ? "Ver código" : "Ver demonstração"}: ${project.title}`}
+                  className="focus-ring mt-4 inline-block rounded text-sm font-medium text-accent hover:underline"
+                >
+                  {project.link.startsWith("https://github.com/") ? "Ver código ↗" : "Ver demonstração ↗"}
+                </a>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
