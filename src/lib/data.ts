@@ -40,28 +40,41 @@ export const skills = [
   },
 ];
 
-export const timeline = [
+// Experiencias profissionais, da mais recente para a mais antiga. Datas no
+// formato AAAA-MM; `end: null` marca o emprego atual.
+export const experiences = [
   {
-    year: "set/2026 – Atual",
-    title: "Analista de Suporte de TI — Elo Infraestrutura",
+    id: "elo-infraestrutura",
+    start: "2026-09",
+    end: null,
+    role: "Analista de Suporte de TI",
+    company: "Elo Infraestrutura",
     description:
       "Suporte técnico N1/N2, gestão de infraestrutura de redes, administração de acessos e rotinas de backup, controle de ativos e documentação técnica.",
   },
   {
-    year: "jul/2025 – set/2025",
-    title: "Técnico de Impressoras — Mactron",
+    id: "mactron",
+    start: "2025-07",
+    end: "2025-09",
+    role: "Técnico de Impressoras",
+    company: "Mactron",
     description:
       "Diagnóstico e resolução de falhas de hardware/software, integração de equipamentos à rede corporativa e manutenções preventivas.",
   },
   {
-    year: "mai/2024 – jun/2025",
-    title: "Assistente de T.I. — 2º Tabelião de Notas de Ribeirão Preto",
+    id: "tabeliao-ribeirao-preto",
+    start: "2024-05",
+    end: "2025-06",
+    role: "Assistente de T.I.",
+    company: "2º Tabelião de Notas de Ribeirão Preto",
     description:
       "Suporte aos sistemas do cartório, emissão/validação de certificados digitais e otimização de rotinas administrativas.",
   },
-  {
-    year: "Formação",
-    title: "Tecnólogo em Análise e Desenvolvimento de Sistemas",
-    description: "Universidade Paulista (UNIP) — Ribeirão Preto, SP. Concluído.",
-  },
 ];
+
+// Formacao fica fora da linha do tempo profissional (periodo nao informado).
+export const education = {
+  course: "Tecnólogo em Análise e Desenvolvimento de Sistemas",
+  institution: "Universidade Paulista (UNIP) — Ribeirão Preto, SP",
+  status: "Concluído",
+};

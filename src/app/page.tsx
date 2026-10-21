@@ -39,12 +39,10 @@ export default async function Home() {
         <ScrollReveal>
           <Skills />
         </ScrollReveal>
-        <ScrollReveal>
-          <Projects projects={projects} />
-        </ScrollReveal>
-        <ScrollReveal>
-          <Timeline />
-        </ScrollReveal>
+        {/* Projetos e Trajetória têm movimento ligado à rolagem; um fade por cima
+            esconderia texto e atrapalharia as medidas do sticky. */}
+        <Projects projects={projects} />
+        <Timeline />
         <ScrollReveal>
           <Contact />
         </ScrollReveal>

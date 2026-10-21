@@ -44,3 +44,332 @@ body {
   opacity: 1;
   transform: none;
 }
+
+/* Altura do cabeçalho fixo, medida no cliente (scroll-orchestrator): âncoras e
+   foco por teclado param abaixo dele. */
+html {
+  scroll-padding-top: var(--header-offset, 4.5rem);
+}
+
+@layer components {
+  /* ---------- Trajetória ---------- */
+
+  .timeline-section {
+    --timeline-column: 1.25rem;
+    --timeline-gap-x: 1.25rem;
+    --timeline-gap-y: 1.5rem;
+    --card-padding: 1.25rem;
+    --marker-size: 0.75rem;
+    /* Centro do marcador na altura da linha do período. */
+    --marker-y: calc(var(--card-padding) + 0.5rem);
+  }
+
+  @media (min-width: 768px) {
+    .timeline-section {
+      --timeline-column: 1.5rem;
+      --timeline-gap-x: 1.5rem;
+      --timeline-gap-y: 2rem;
+      --card-padding: 1.75rem;
+    }
+  }
+
+  .timeline {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--timeline-gap-y);
+  }
+
+  .timeline-item,
+  .timeline-education {
+    position: relative;
+    padding-left: calc(var(--timeline-column) + var(--timeline-gap-x));
+  }
+
+  .timeline-education {
+    margin-top: 2.5rem;
+  }
+
+  /* Trilho base: um trecho por item, do marcador dele até o do item seguinte. */
+  .timeline-item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--timeline-column) / 2 - 1px);
+    top: var(--marker-y);
+    width: 2px;
+    height: calc(100% + var(--timeline-gap-y));
+    background: theme(colors.border);
+  }
+
+  .timeline-marker {
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--timeline-column) / 2 - var(--marker-size) / 2);
+    top: calc(var(--marker-y) - var(--marker-size) / 2);
+    width: var(--marker-size);
+    height: var(--marker-size);
+    border-radius: 9999px;
+    background: theme(colors.accent.DEFAULT);
+  }
+
+  .timeline-card {
+    position: relative;
+    border: 1px solid theme(colors.border);
+    border-radius: 1rem;
+    background: theme(colors.surface);
+    padding: var(--card-padding);
+  }
+
+  .timeline-fill,
+  .timeline-accent {
+    display: none;
+  }
+
+  /* Camadas ligadas à rolagem: só decoração; o texto nunca depende delas. */
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .timeline[data-scroll="on"] .timeline-fill {
+      display: block;
+      position: absolute;
+      z-index: 1;
+      left: calc(var(--timeline-column) / 2 - 1px);
+      width: 2px;
+      background: theme(colors.accent.DEFAULT);
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+
+    .timeline[data-scroll="on"] .timeline-marker {
+      background: theme(colors.background);
+      box-shadow: inset 0 0 0 2px rgba(124, 108, 246, 0.7);
+    }
+
+    .timeline[data-scroll="on"] .timeline-marker[data-reached] {
+      background: theme(colors.accent.DEFAULT);
+      box-shadow: none;
+    }
+
+    .timeline[data-scroll="on"] [data-active] > .timeline-marker {
+      transform: scale(1.12);
+      box-shadow:
+        inset 0 0 0 2px rgba(124, 108, 246, 0.7),
+        0 0 0 4px rgba(124, 108, 246, 0.28);
+    }
+
+    .timeline[data-scroll="on"] [data-active] > .timeline-marker[data-reached] {
+      box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.28);
+    }
+
+    .timeline[data-scroll="on"] [data-active] > .timeline-card {
+      border-color: rgba(124, 108, 246, 0.6);
+    }
+  }
+
+  /* Acento do cartão só em telas largas e altas; no celular o efeito fica no eixo e no contorno. */
+  @media screen and (prefers-reduced-motion: no-preference) and (min-width: 768px) and (min-height: 480px) {
+    .timeline[data-scroll="on"] .timeline-accent {
+      display: block;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(90deg, rgba(124, 108, 246, 0.12), rgba(124, 108, 246, 0) 60%);
+      box-shadow: inset 0 0 0 1px rgba(124, 108, 246, 0.35);
+    }
+  }
+
+  /* ---------- Projetos ---------- */
+
+  .projects-track {
+    --gutter: 1.5rem;
+    --panel-fraction: 0.9;
+    --track-gap: 1rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  .project-panel {
+    container-type: inline-size;
+    height: 100%;
+    overflow: hidden;
+    border-width: 1px;
+    border-radius: 1rem;
+    background: theme(colors.surface);
+  }
+
+  .project-panel__layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .project-panel__media {
+    border-bottom: 1px solid theme(colors.border);
+    background: rgba(11, 12, 20, 0.6);
+  }
+
+  .project-panel__frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+
+  .project-panel__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.25rem;
+  }
+
+  @container (min-width: 30rem) {
+    .project-panel__body {
+      padding: 1.75rem;
+    }
+  }
+
+  /* Duas colunas (~54% imagem / 46% texto) quando o painel comporta ~720 px. */
+  @container (min-width: 45rem) {
+    .project-panel__layout {
+      display: grid;
+      grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
+    }
+
+    .project-panel__media {
+      display: flex;
+      align-items: center;
+      border-bottom: 0;
+      border-right: 1px solid theme(colors.border);
+    }
+  }
+
+  .projects-viewport:focus-visible {
+    outline: 2px solid theme(colors.accent.DEFAULT);
+    outline-offset: -2px;
+  }
+
+  .projects-nav__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid theme(colors.border);
+    border-radius: 9999px;
+    color: theme(colors.foreground);
+    transition: border-color 0.15s ease;
+  }
+
+  .projects-nav__button:hover {
+    border-color: rgba(124, 108, 246, 0.6);
+  }
+
+  .projects-nav__button[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  .projects-nav__button[aria-disabled="true"]:hover {
+    border-color: theme(colors.border);
+  }
+
+  /* Modos horizontais (trilho nativo e sticky). Só na tela: a impressão fica com a lista. */
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .projects[data-mode="rail"] .projects-viewport,
+    .projects[data-mode="sticky"] .projects-viewport {
+      container: projects-viewport / inline-size;
+    }
+
+    .projects[data-mode="rail"] .projects-viewport {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: max(1.5rem, calc((100% - 72rem) / 2 + 1.5rem));
+      scrollbar-color: theme(colors.border) transparent;
+    }
+
+    /* clip (e não hidden): o foco num link não consegue rolar o viewport por baixo do transform. */
+    .projects[data-mode="sticky"] .projects-viewport {
+      overflow-x: hidden;
+      overflow-x: clip;
+    }
+
+    .projects[data-mode="sticky"] .projects-stage {
+      position: sticky;
+      overflow-anchor: none;
+    }
+
+    .projects[data-mode="rail"] .projects-track,
+    .projects[data-mode="sticky"] .projects-track {
+      /* Trilho alinhado ao container das outras seções, com os painéis vazando até a borda da tela. */
+      --gutter: max(1.5rem, calc((100cqw - 72rem) / 2 + 1.5rem));
+      flex-direction: row;
+      align-items: stretch;
+      gap: var(--track-gap);
+      width: max-content;
+      max-width: none;
+      margin-inline: 0;
+      padding: 0.25rem var(--gutter);
+    }
+
+    .projects[data-mode="rail"] .projects-track > li,
+    .projects[data-mode="sticky"] .projects-track > li {
+      flex: none;
+      width: min(60rem, calc((100cqw - 2 * var(--gutter)) * var(--panel-fraction)));
+      scroll-snap-align: start;
+    }
+
+    @container projects-viewport (max-width: 22.5rem) {
+      .projects-track {
+        --panel-fraction: 1;
+      }
+    }
+
+    @container projects-viewport (min-width: 64rem) {
+      .projects-track {
+        --panel-fraction: 0.8;
+        --track-gap: 2rem;
+      }
+    }
+  }
+}
+
+@media print {
+  body {
+    background-image: none;
+  }
+
+  .timeline-card,
+  .project-panel {
+    break-inside: avoid;
+  }
+
+  /* Estilos escritos pelo laço de rolagem não valem no papel. */
+  .projects-runway {
+    height: auto !important;
+  }
+
+  .projects-stage {
+    position: static !important;
+  }
+
+  .projects-track {
+    transform: none !important;
+  }
+
+  .projects-nav,
+  .projects-toggle {
+    display: none !important;
+  }
+}
