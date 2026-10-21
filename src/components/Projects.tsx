@@ -52,8 +52,8 @@ export function Projects({ projects }: { projects: Project[] }) {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <article className="overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/60">
           <Image
-            src="/projects/perol-compra.png"
-            alt="Landing page Perol: galeria do F5 Flotador, seletor de volume e kits"
+            src="/projects/perol-capa.png"
+            alt="Landing page Perol no navegador, com galeria e kits do F5 Flotador, e no celular, com o Lavix"
             width={640}
             height={176}
             className="h-44 w-full object-cover"
