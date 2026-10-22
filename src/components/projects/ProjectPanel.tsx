@@ -21,6 +21,8 @@ export type ProjectPanelData = {
   techs?: string[];
   /** alt vazio quando a imagem só repete o texto do painel. */
   image: { src: string; alt: string } | null;
+  /** Demonstração em vídeo: toma o lugar da imagem e mantém a proporção original. */
+  video?: { src: string; poster: string; width: number; height: number; label: string };
   actions: ProjectAction[];
 };
 
@@ -32,7 +34,7 @@ function listInWords(items: string[]) {
 }
 
 // Um painel de tela cheia: a linha do nome fica no mesmo lugar em todos, então
-// a rolagem lê como virar pranchas de um livro. Os campos alternam claro e escuro.
+// a rolagem lê como virar pranchas de um livro. Os campos alternam o fundo e o elevado.
 export function ProjectPanel({
   project,
   index,
@@ -43,7 +45,7 @@ export function ProjectPanel({
   project: ProjectPanelData;
   index: number;
   total: number;
-  tone: "light" | "dark";
+  tone: "raised" | "dark";
   loading: "lazy" | "eager";
 }) {
   const headingId = `projeto-${project.id}`;
@@ -113,8 +115,31 @@ export function ProjectPanel({
           ) : null}
         </div>
 
-        <figure className="project__picture" data-reveal="picture" style={second}>
-          {project.image ? (
+        <figure
+          className="project__picture"
+          data-reveal="picture"
+          style={
+            project.video
+              ? { ...second, aspectRatio: `${project.video.width} / ${project.video.height}` }
+              : second
+          }
+        >
+          {/* Sem som e em loop; o ProjectsShowcase toca só o vídeo do painel da vez. */}
+          {project.video ? (
+            <video
+              muted
+              loop
+              playsInline
+              controls
+              preload={loading === "eager" ? "metadata" : "none"}
+              width={project.video.width}
+              height={project.video.height}
+              poster={project.video.poster}
+              aria-label={project.video.label}
+            >
+              <source src={project.video.src} type="video/webm" />
+            </video>
+          ) : project.image ? (
             <Image
               src={project.image.src}
               alt={project.image.alt}

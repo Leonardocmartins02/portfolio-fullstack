@@ -35,9 +35,13 @@ const featured: ProjectPanelData[] = [
       text: "transações e bloqueio de linha no PostgreSQL para validar movimentações e evitar saídas concorrentes sobre o mesmo saldo.",
     },
     techs: ["React", "Express", "TypeScript", "Prisma", "PostgreSQL", "Vitest"],
-    image: {
-      src: "/projects/simplestock-v2-dashboard.png",
-      alt: "SimpleStock: dashboard da nova interface com indicadores, evolução do estoque e produtos para repor",
+    image: null,
+    video: {
+      src: "/projects/simplestock-v2-demo.webm",
+      poster: "/projects/simplestock-v2-poster.png",
+      width: 1440,
+      height: 1080,
+      label: "Demonstração do SimpleStock: dashboard, produtos e registro de uma movimentação de estoque",
     },
     actions: [
       { label: "Ver demonstração", href: "/projetos/simplestock", external: false },
@@ -53,9 +57,13 @@ const featured: ProjectPanelData[] = [
     description:
       "Página de venda do F5 Flotador e do Lavix para campanhas de anúncio: troca de produto, galeria por volume, kits com preço por litro e guia por ambiente. Fiz o código; as artes são de um parceiro.",
     techs: ["React", "TanStack Start", "Tailwind CSS"],
-    image: {
-      src: "/projects/perol-capa.png",
-      alt: "Landing page Perol no navegador, com galeria e kits do F5 Flotador, e no celular, com o Lavix",
+    image: null,
+    video: {
+      src: "/projects/perol-demo.webm",
+      poster: "/projects/perol-poster.png",
+      width: 1440,
+      height: 1080,
+      label: "Demonstração da landing page Perol: galeria e kits, dúvidas, guia por ambiente, troca para o Lavix e versão para celular",
     },
     actions: [
       { label: "Ver demonstração", href: "/projetos/perol", external: false },

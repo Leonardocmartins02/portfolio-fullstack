@@ -9,6 +9,7 @@ const links = [
   { href: "#sobre", label: "Sobre" },
   { href: "#projetos", label: "Projetos" },
   { href: "#trajetoria", label: "Trajetória" },
+  { href: "#skills", label: "Skills" },
   { href: "#contato", label: "Contato" },
 ];
 
@@ -26,8 +27,9 @@ export function Header() {
     toggleRef.current?.focus();
   }
 
-  // A barra toma o campo do capítulo que passa embaixo dela (claro ou escuro) e
-  // marca no menu a página que está sendo lida.
+  // A barra toma o campo do capítulo que passa embaixo dela (fundo, elevado ou azul),
+  // marca no menu a página que está sendo lida e só mostra o nome depois que o
+  // nome grande do início sai de baixo dela.
   const headerRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const header = headerRef.current;
@@ -35,6 +37,7 @@ export function Header() {
     const navLinks = Array.from(header.querySelectorAll<HTMLAnchorElement>("[data-page-link]"));
     let tone = "dark";
     let current: string | null = null;
+    let brand = true;
 
     const unregister = registerScrollController({
       element: header,
@@ -55,10 +58,16 @@ export function Header() {
           const rect = section?.getBoundingClientRect();
           if (rect && rect.top <= line && rect.bottom > line) current = link.href.slice(1);
         }
+        const headline = document.querySelector(".hero__headline");
+        brand = !headline || headline.getBoundingClientRect().bottom <= frame.headerOffset;
       },
       write() {
         // Atributo (e não classe): o React controla o className do <header>.
         if (header.dataset.tone !== tone) header.dataset.tone = tone;
+        if (brand !== ("brand" in header.dataset)) {
+          if (brand) header.dataset.brand = "";
+          else delete header.dataset.brand;
+        }
         for (const link of navLinks) {
           if (link.dataset.pageLink === current) link.setAttribute("aria-current", "location");
           else link.removeAttribute("aria-current");
@@ -68,6 +77,7 @@ export function Header() {
     return () => {
       unregister();
       for (const link of navLinks) link.removeAttribute("aria-current");
+      delete header.dataset.brand;
     };
   }, []);
 
@@ -101,7 +111,7 @@ export function Header() {
   return (
     <header ref={headerRef} className="site-header sticky top-0 z-40">
       <div data-header-bar className="frame flex items-center justify-between py-3.5">
-        <Link href="#inicio" className="focus-ring flex items-center gap-2.5 rounded-full">
+        <Link href="#inicio" className="site-header__brand focus-ring flex items-center gap-2.5 rounded-full">
           <span className="t-small font-semibold tracking-tight" translate="no">
             {profile.name}
           </span>

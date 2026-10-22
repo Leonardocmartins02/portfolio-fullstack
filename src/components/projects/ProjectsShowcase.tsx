@@ -12,6 +12,10 @@ import {
 // Assinatura da página (taste-skill, "pinned story"): o título "Projetos" fica
 // preso no topo enquanto cada projeto, um painel de tela cheia, sobe por cima do
 // anterior. Sem JS ou com movimento reduzido, os painéis só seguem um abaixo do outro.
+
+// Pilha de cartas: quanto o painel coberto recua (5%) enquanto o seguinte sobe.
+const DEPTH_SCALE = 0.05;
+
 export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] }) {
   const total = projects.length;
   const reducedMotion = useReducedMotion();
@@ -32,9 +36,14 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
       Array.from(slot.querySelectorAll<HTMLElement>(".project__row > *, .project__text > *")),
     );
     const heading = section.querySelector<HTMLElement>(".projects__heading")!;
+    const videos = slots.map((slot) => slot.querySelector("video"));
     let fade = slots.map(() => 0);
+    let depth = slots.map(() => 0);
     let release = 0;
     let current = 0;
+    // Painel com a seção à vista (-1 fora dela) e o último cujo vídeo recebeu play.
+    let active = -1;
+    let playing = -1;
     let sectionTop = 0;
     let preloaded = false;
 
@@ -47,13 +56,15 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
         // Altura do conteúdo (sem o mínimo de uma tela), como ficaria com a faixa.
         const pinned = "pinned" in section.dataset;
         const band = (section.querySelector("h2")?.offsetHeight ?? 0) + 4;
-        const fits = slots.every((slot) => {
+        const fits = slots.every((slot, i) => {
           const article = slot.firstElementChild as HTMLElement;
           const bottom = Math.max(
             ...Array.from(article.children).map((child) => child.getBoundingClientRect().bottom),
           );
+          // O painel que recua está em escala: mede a altura como se estivesse inteiro.
           const content =
-            bottom - article.getBoundingClientRect().top + parseFloat(getComputedStyle(article).paddingBottom);
+            (bottom - article.getBoundingClientRect().top) / (1 - DEPTH_SCALE * depth[i]) +
+            parseFloat(getComputedStyle(article).paddingBottom);
           return content + (pinned ? 0 : band) <= frame.smallViewportHeight + 1;
         });
         if (fits) section.dataset.pinned = "";
@@ -81,17 +92,21 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
           if (slot.getBoundingClientRect().top <= frame.viewportHeight * 0.5) index = i;
         });
         current = index;
+        const listRect = list.getBoundingClientRect();
+        active = listRect.top < frame.viewportHeight && listRect.bottom > frame.headerOffset ? index : -1;
         // Quando o último painel começa a sair, o título preso sai junto com ele
         // (sem isso ficaria por cima do texto até o fim da seção).
-        release = Math.min(0, list.getBoundingClientRect().bottom - frame.viewportHeight);
-        // Quanto o painel seguinte já subiu sobre a tela (0 a 1); o texto some no
-        // primeiro terço, antes que a folha nova chegue até ele.
-        fade = slots.map((_, i) => {
+        release = Math.min(0, listRect.bottom - frame.viewportHeight);
+        // Quanto o painel seguinte já subiu sobre a tela (0 a 1). O texto some no
+        // primeiro terço, antes que a folha nova chegue até ele; o painel recua e
+        // escurece ao longo de toda a subida.
+        depth = slots.map((_, i) => {
           const next = slots[i + 1];
           if (!next) return 0;
           const covered = (frame.viewportHeight - next.getBoundingClientRect().top) / frame.viewportHeight;
-          return Math.min(1, Math.max(0, covered / 0.35));
+          return Math.min(1, Math.max(0, covered));
         });
+        fade = depth.map((covered) => Math.min(1, covered / 0.35));
       },
       write(frame) {
         heading.dataset.tone = slots[current]?.dataset.chapter ?? "dark";
@@ -109,6 +124,23 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
             if (item.style.transform !== transform) item.style.transform = transform;
           }
         });
+        slots.forEach((slot, i) => {
+          const k = depth[i];
+          const scale = k > 0 ? `scale(${(1 - DEPTH_SCALE * k).toFixed(4)})` : "";
+          const shade = k > 0 ? k.toFixed(3) : "";
+          if (slot.style.transform !== scale) slot.style.transform = scale;
+          if (slot.style.getPropertyValue("--depth") !== shade) {
+            if (shade) slot.style.setProperty("--depth", shade);
+            else slot.style.removeProperty("--depth");
+          }
+        });
+        // Só o vídeo do painel da vez toca. O play acontece na troca de painel,
+        // então uma pausa feita pelo visitante vale até ele sair do painel.
+        if (active !== playing) {
+          if (playing !== -1) videos[playing]?.pause();
+          videos[active]?.play().catch(() => {});
+          playing = active;
+        }
         if (!preloaded && sectionTop - frame.scrollY < frame.viewportHeight * 2) {
           preloaded = true;
           setPreload(true);
@@ -121,7 +153,12 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
       delete section.dataset.pinned;
       heading.style.removeProperty("transform");
       delete heading.dataset.tone;
-      for (const slot of slots) slot.style.removeProperty("--stick");
+      for (const slot of slots) {
+        slot.style.removeProperty("--stick");
+        slot.style.removeProperty("--depth");
+        slot.style.removeProperty("transform");
+      }
+      for (const video of videos) video?.pause();
       for (const item of copy.flat()) {
         item.style.removeProperty("opacity");
         item.style.removeProperty("transform");
@@ -171,7 +208,7 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
             project={project}
             index={i}
             total={total}
-            tone={i % 2 === 0 ? "dark" : "light"}
+            tone={i % 2 === 0 ? "dark" : "raised"}
             loading={preload || i === 0 ? "eager" : "lazy"}
           />
         ))}

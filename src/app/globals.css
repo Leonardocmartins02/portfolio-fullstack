@@ -3,21 +3,21 @@
 @tailwind utilities;
 
 /* ---------- Sistema visual ----------
-   Tipografia e cores a partir do DESIGN.md da Vercel (awesome-design-md): Geist,
-   tinta e cinzas, um azul de ação. Composição e movimento seguem o taste-skill
+   Cores a partir do DESIGN.md da Vercel (awesome-design-md): tinta e cinzas, um
+   azul de ação. Tipografia em IBM Plex Sans (layout.tsx). Composição e movimento seguem o taste-skill
    (direção "pinned poster"): cada seção é um capítulo com o próprio campo de cor,
    com corte seco entre eles; sem rótulos acima de títulos, linhas finas,
    gradientes, brilhos ou sombras em repouso.
    As cores são canais RGB para o Tailwind aplicar opacidade (bg-surface/60). */
 
 :root {
-  --ground: 10 18 32;
-  --surface: 24 38 58;
-  --line: 64 64 64;
-  --ink: 242 246 252;
-  --muted: 174 190 210;
+  --ground: 6 9 15;
+  --surface: 17 24 36;
+  --line: 44 54 70;
+  --ink: 236 241 248;
+  --muted: 150 164 184;
   --accent: 82 168 255;
-  --on-accent: 10 10 10;
+  --on-accent: 6 9 15;
 
   /* Uma grade, um par de margens iguais. */
   --margin: clamp(20px, 4.5vw, 88px);
@@ -39,41 +39,42 @@
   color-scheme: dark;
 }
 
-/* Capítulo claro: polaridade invertida, como as faixas do DESIGN.md da Vercel.
-   O cabeçalho entra nele quando passa por cima de um capítulo claro. */
-.chapter-light,
-.site-header[data-tone="light"],
-.projects__heading[data-tone="light"] {
-  --ground: 250 250 250;
-  --surface: 235 235 235;
-  --line: 190 190 190;
-  --ink: 23 23 23;
-  --muted: 77 77 77;
-  --accent: 0 98 209;
-  --on-accent: 255 255 255;
-  color-scheme: light;
+/* Todo o site é escuro. Os capítulos se separam pela profundidade: o fundo
+   quase preto, o elevado um tom acima e o azul profundo do contato. O cabeçalho
+   toma o tom do capítulo que passa embaixo dele. */
+.chapter-dark {
+  --ground: 6 9 15;
+  --surface: 17 24 36;
+  --line: 44 54 70;
+  --ink: 236 241 248;
+  --muted: 150 164 184;
+  --accent: 82 168 255;
+  --on-accent: 6 9 15;
+  color-scheme: dark;
 }
 
-.chapter-dark {
-  --ground: 10 18 32;
-  --surface: 24 38 58;
-  --line: 64 64 64;
-  --ink: 242 246 252;
-  --muted: 174 190 210;
+.chapter-raised,
+.site-header[data-tone="raised"],
+.projects__heading[data-tone="raised"] {
+  --ground: 16 23 34;
+  --surface: 27 36 51;
+  --line: 54 66 86;
+  --ink: 236 241 248;
+  --muted: 160 174 194;
   --accent: 82 168 255;
-  --on-accent: 10 10 10;
+  --on-accent: 6 9 15;
   color-scheme: dark;
 }
 
 .chapter-blue,
 .site-header[data-tone="blue"] {
-  --ground: 12 67 170;
-  --surface: 24 79 181;
+  --ground: 10 34 82;
+  --surface: 20 48 104;
   --ink: 255 255 255;
-  --muted: 224 235 255;
-  --line: 162 190 240;
+  --muted: 200 215 240;
+  --line: 70 100 160;
   --accent: 255 255 255;
-  --on-accent: 12 67 170;
+  --on-accent: 10 34 82;
   color-scheme: dark;
 }
 
@@ -236,6 +237,21 @@ h3 {
     transition:
       background-color 300ms ease,
       color 300ms ease;
+  }
+
+  /* Com JS, o nome só aparece quando o nome grande do início sai de baixo da
+     barra (data-brand); sem JS fica sempre à vista. */
+  .js .site-header__brand {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 300ms ease,
+      visibility 300ms;
+  }
+
+  .js .site-header[data-brand] .site-header__brand {
+    opacity: 1;
+    visibility: visible;
   }
 
   .nav-link[aria-current="location"] {
@@ -403,21 +419,9 @@ h3 {
     gap: 1.75rem 1.5rem;
   }
 
-  .about__tools {
-    display: grid;
-    gap: 2.5rem var(--gutter);
-  }
-
   @media (min-width: 640px) {
-    .about__facts,
-    .about__tools {
+    .about__facts {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .about__tools {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
@@ -485,7 +489,8 @@ h3 {
     background-color: rgb(var(--surface));
   }
 
-  .project__picture img {
+  .project__picture img,
+  .project__picture video {
     display: block;
     height: 100%;
     width: 100%;
@@ -526,6 +531,23 @@ h3 {
     .js .project-slot {
       position: sticky;
       top: var(--stick, 0px);
+      /* Pilha de cartas: o painel coberto recua (escala no ProjectsShowcase),
+         arredonda os cantos e escurece enquanto o seguinte sobe (--depth 0 a 1).
+         O contorno só existe durante a troca: marca a borda da carta escura
+         sobre o fundo escuro e some em repouso. */
+      transform-origin: 50% 0;
+      border-radius: calc(var(--depth, 0) * 20px);
+      box-shadow: 0 0 0 1px rgb(var(--ink) / calc(var(--depth, 0) * 0.16)); /* taste-skill-ignore: contorno só em movimento, não sombra em repouso. */
+    }
+
+    .js .project-slot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-color: rgb(0 0 0);
+      opacity: calc(var(--depth, 0) * 0.5);
+      pointer-events: none;
     }
 
     .js .project {
@@ -585,6 +607,79 @@ h3 {
   @media (min-width: 768px) {
     .timeline__row {
       grid-template-columns: 10rem minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- Skills: título com ✳, grupos numerados em etiquetas ---------- */
+
+  .skills__title {
+    position: relative;
+    font-size: clamp(36px, 5vw, 76px);
+    font-weight: 600;
+    line-height: 1.06;
+    letter-spacing: -0.05em;
+  }
+
+  /* A segunda linha em itálico de verdade (arquivo à parte, ver layout.tsx). */
+  .skills__title em {
+    font-family: var(--font-sans-italic), var(--font-sans), sans-serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .skills__star {
+    display: block;
+    margin-top: 2.5rem;
+    font-family: serif;
+    font-size: 120px;
+    font-weight: 400;
+    line-height: 1;
+    color: rgb(var(--accent));
+  }
+
+  .skills__group {
+    padding-block: 1.75rem;
+    border-bottom: 1px solid rgb(var(--line)); /* taste-skill-ignore: divisória entre grupos, parte do molde da seção. */
+  }
+
+  .skills__group:first-child {
+    padding-top: 0;
+  }
+
+  .skills__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .skills__tags li {
+    border: 1px solid rgb(var(--line)); /* taste-skill-ignore: contorno da etiqueta, parte do molde da seção. */
+    border-radius: 9999px;
+    padding: 0.375rem 0.875rem;
+    font-size: var(--step-small);
+    line-height: 1.4;
+    transition:
+      background-color var(--t-hover) ease,
+      border-color var(--t-hover) ease,
+      color var(--t-hover) ease;
+  }
+
+  @media (hover: hover) {
+    .skills__tags li:hover {
+      background-color: rgb(var(--ink));
+      border-color: rgb(var(--ink));
+      color: rgb(var(--ground));
+    }
+  }
+
+  /* Em uma coluna, o ✳ sobe para o canto do título, ao lado da primeira linha. */
+  @media (max-width: 1023px) {
+    .skills__star {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 0;
+      font-size: clamp(56px, 12vw, 88px);
     }
   }
 

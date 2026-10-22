@@ -24,7 +24,7 @@ Env vars live in `.env` (see `.env.example`): `DATABASE_URL`, `NEXTAUTH_SECRET`,
 
 Next.js 14 App Router portfolio site with a real backend: public marketing site + an authenticated admin panel for managing displayed projects, backed by Prisma/PostgreSQL (Neon).
 
-- **Public site** (`src/app/page.tsx`) composes the section components in `src/components/` (Hero, About, Skills, Timeline, Stats, Projects, Contact, Footer) in order. Static personal content (bio, skills, timeline, links) lives in `src/lib/data.ts` — edit this file to change profile content; **projects are not static**, they come from the database.
+- **Public site** (`src/app/page.tsx`) composes the section components in `src/components/` (Header, Hero, About, Projects, Timeline, Skills, Contact, Footer) in order. Static personal content (bio, skills, timeline, links) lives in `src/lib/data.ts` — edit this file to change profile content; **projects are not static**, they come from the database.
 - **Auth**: NextAuth v4 with a Credentials provider (`src/lib/auth.ts`), JWT session strategy, single `Admin` table checked via bcrypt. `src/middleware.ts` gates `/admin/dashboard/:path*`, redirecting unauthenticated users to `/admin/login`.
 - **Admin panel** (`src/app/admin/dashboard`, `src/components/admin/*`) lets the logged-in admin CRUD projects (`ProjectManager.tsx`) and view submitted contact messages (`MessagesList.tsx`), calling the `/api/projects` routes client-side.
 - **API routes** (`src/app/api/*`) are the only way data is mutated:

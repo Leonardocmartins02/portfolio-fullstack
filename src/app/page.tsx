@@ -5,6 +5,7 @@ import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Projects } from "@/components/Projects";
 import { Timeline } from "@/components/Timeline";
+import { Skills } from "@/components/Skills";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { Reveal } from "@/components/Reveal";
@@ -28,7 +29,7 @@ export default async function Home() {
   return (
     <>
       <Header />
-      {/* Cada seção é um capítulo com o próprio campo de cor (claro ou escuro),
+      {/* Cada seção é um capítulo com o próprio campo de cor (fundo, elevado ou azul),
           com corte seco entre eles; o hero segura a imagem enquanto o Sobre sobe
           por cima, e os projetos sobem um sobre o outro. */}
       <main id="main">
@@ -36,6 +37,7 @@ export default async function Home() {
         <About />
         <Projects projects={projects} />
         <Timeline />
+        <Skills />
         <Contact />
       </main>
       <Footer />

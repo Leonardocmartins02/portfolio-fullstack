@@ -71,7 +71,7 @@ export function Contact() {
     { label: "WhatsApp", href: profile.whatsapp },
   ];
 
-  // Capítulo claro de fechamento: o convite e o formulário em cima, o e-mail como
+  // Capítulo azul de fechamento: o convite e o formulário em cima, o e-mail como
   // tipografia grande embaixo, os canais nos cantos.
   return (
     <section
