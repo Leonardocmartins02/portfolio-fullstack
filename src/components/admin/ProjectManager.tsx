@@ -185,7 +185,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             id="project-image"
             value={form.imageUrl}
             onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-            placeholder="https://..."
+            placeholder="https://…"
             className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
@@ -198,7 +198,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             id="project-link"
             value={form.link}
             onChange={(e) => setForm({ ...form, link: e.target.value })}
-            placeholder="https://..."
+            placeholder="https://…"
             className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
           />
         </div>
@@ -228,7 +228,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
             disabled={saving}
             className="focus-ring rounded-full bg-accent px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {saving ? "Salvando..." : editingId ? "Salvar alterações" : "Adicionar projeto"}
+            {saving ? "Salvando…" : editingId ? "Salvar alterações" : "Adicionar projeto"}
           </button>
           {editingId && (
             <button
@@ -271,7 +271,7 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
                 disabled={deletingId === project.id}
                 className="focus-ring rounded-full border border-border px-3 py-2 text-xs text-red-400 transition-colors hover:border-red-400 disabled:opacity-50"
               >
-                {deletingId === project.id ? "Removendo..." : "Remover"}
+                {deletingId === project.id ? "Removendo…" : "Remover"}
               </button>
             </div>
           </div>

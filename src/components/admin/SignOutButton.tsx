@@ -17,7 +17,7 @@ export function SignOutButton() {
       disabled={loading}
       className="focus-ring rounded-full border border-border px-4 py-2 text-sm text-foreground transition-colors hover:border-accent disabled:opacity-50"
     >
-      {loading ? "Saindo..." : "Sair"}
+      {loading ? "Saindo…" : "Sair"}
     </button>
   );
 }

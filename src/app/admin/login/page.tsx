@@ -77,7 +77,7 @@ export default function AdminLoginPage() {
           disabled={loading}
           className="focus-ring w-full rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Entrando…" : "Entrar"}
         </button>
       </form>
       <p className="mt-4 text-xs text-muted">

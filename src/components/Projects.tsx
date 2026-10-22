@@ -4,6 +4,20 @@ import type { ProjectPanelData } from "@/components/projects/ProjectPanel";
 
 const stockRepository = "https://github.com/Leonardocmartins02/Sistema-Estoque-main";
 const perolRepository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
+const roomsRepository = "https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas";
+
+// Notas editoriais para projetos que vêm do banco, pelo link do repositório.
+const notes: Record<string, Pick<ProjectPanelData, "fact" | "highlight">> = {
+  [roomsRepository]: {
+    fact: "Primeiro projeto",
+    highlight: {
+      label: "Ponto de partida",
+      text: "meu primeiro projeto, mais simples que os outros; fica aqui para mostrar a evolução até os mais recentes.",
+    },
+  },
+};
+
+const normalize = (link: string | null) => link?.replace(/\.git$|\/$/g, "");
 
 // Projetos com apresentação própria no código: aparecem mesmo se o banco falhar.
 const featured: ProjectPanelData[] = [
@@ -12,7 +26,7 @@ const featured: ProjectPanelData[] = [
     name: "SimpleStock",
     title: "SimpleStock — sistema de estoque",
     category: "Full stack",
-    badge: "Projeto principal",
+    fact: "Projeto principal",
     // Interface, API e persistência em detalhe ficam na página do projeto.
     description:
       "Controle de produtos, entradas, saídas e ajustes de inventário, com histórico das movimentações.",
@@ -29,13 +43,13 @@ const featured: ProjectPanelData[] = [
       { label: "Ver demonstração", href: "/projetos/simplestock", external: false },
       { label: "Ver código", href: stockRepository, external: true },
     ],
-    featured: true,
   },
   {
     id: "perol",
     name: "Perol",
     title: "Perol: landing page de produtos de limpeza",
-    category: "Landing page · Front-end",
+    category: "Landing page, front-end",
+    fact: "Demonstração em vídeo",
     description:
       "Página de venda do F5 Flotador e do Lavix para campanhas de anúncio: troca de produto, galeria por volume, kits com preço por litro e guia por ambiente. Fiz o código; as artes são de um parceiro.",
     techs: ["React", "TanStack Start", "Tailwind CSS"],
@@ -54,6 +68,9 @@ const featured: ProjectPanelData[] = [
 function fromDatabase(project: Project): ProjectPanelData {
   const isRepository = project.link?.startsWith("https://github.com/") ?? false;
   return {
+    // Fato da linha do painel: o que o link de fato é, salvo nota editorial.
+    fact: project.link ? (isRepository ? "Código aberto" : "Site no ar") : undefined,
+    ...notes[normalize(project.link) ?? ""],
     id: project.id,
     name: project.title,
     title: project.title,
@@ -76,9 +93,16 @@ function fromDatabase(project: Project): ProjectPanelData {
 export function Projects({ projects }: { projects: Project[] }) {
   // Projetos com apresentação própria no código não se repetem na lista que vem do banco.
   const otherProjects = projects.filter((project) => {
-    const link = project.link?.replace(/\.git$|\/$/g, "");
+    const link = normalize(project.link);
     return link !== stockRepository && link !== perolRepository;
   });
 
-  return <ProjectsShowcase projects={[...featured, ...otherProjects.map(fromDatabase)]} />;
+  // O Agendamento, primeiro projeto e o mais simples, fecha a lista: a ordem
+  // termina mostrando de onde a evolução partiu.
+  const ordered = [...otherProjects].sort(
+    (a, b) =>
+      Number(normalize(a.link) === roomsRepository) - Number(normalize(b.link) === roomsRepository),
+  );
+
+  return <ProjectsShowcase projects={[...featured, ...ordered.map(fromDatabase)]} />;
 }

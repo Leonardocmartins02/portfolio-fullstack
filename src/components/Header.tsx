@@ -3,14 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { profile } from "@/lib/data";
+import { registerScrollController } from "@/lib/scroll-orchestrator";
 
 const links = [
   { href: "#sobre", label: "Sobre" },
-  { href: "#skills", label: "Skills" },
   { href: "#projetos", label: "Projetos" },
   { href: "#trajetoria", label: "Trajetória" },
   { href: "#contato", label: "Contato" },
 ];
+
+// Linha de leitura que decide a página atual no menu (a mesma da Trajetória).
+const READING_LINE = 0.45;
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +25,51 @@ export function Header() {
     setIsOpen(false);
     toggleRef.current?.focus();
   }
+
+  // A barra toma o campo do capítulo que passa embaixo dela (claro ou escuro) e
+  // marca no menu a página que está sendo lida.
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const navLinks = Array.from(header.querySelectorAll<HTMLAnchorElement>("[data-page-link]"));
+    let tone = "dark";
+    let current: string | null = null;
+
+    const unregister = registerScrollController({
+      element: header,
+      measure() {},
+      read(frame) {
+        const chapters = document.querySelectorAll<HTMLElement>("[data-chapter]");
+        const below = frame.headerOffset + 1;
+        // O último na ordem do documento é o que está pintado por cima (painéis
+        // que sobem, a seção que cobre o hero).
+        chapters.forEach((chapter) => {
+          const rect = chapter.getBoundingClientRect();
+          if (rect.top <= below && rect.bottom > below) tone = chapter.dataset.chapter ?? tone;
+        });
+        const line = frame.headerOffset + READING_LINE * (frame.viewportHeight - frame.headerOffset);
+        current = null;
+        for (const link of links) {
+          const section = document.getElementById(link.href.slice(1));
+          const rect = section?.getBoundingClientRect();
+          if (rect && rect.top <= line && rect.bottom > line) current = link.href.slice(1);
+        }
+      },
+      write() {
+        // Atributo (e não classe): o React controla o className do <header>.
+        if (header.dataset.tone !== tone) header.dataset.tone = tone;
+        for (const link of navLinks) {
+          if (link.dataset.pageLink === current) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        }
+      },
+    });
+    return () => {
+      unregister();
+      for (const link of navLinks) link.removeAttribute("aria-current");
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -51,28 +99,21 @@ export function Header() {
   }, [isOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-      <div data-header-bar className="mx-auto flex max-w-content items-center justify-between px-6 py-4">
-        <Link
-          href="#"
-          className="focus-ring flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/avatar.jpg"
-            alt={profile.name}
-            className="h-7 w-7 rounded-full object-cover"
-          />
-          <span className="text-sm font-medium text-foreground">{profile.name}</span>
-          <span className="h-2 w-2 rounded-full bg-accent" />
+    <header ref={headerRef} className="site-header sticky top-0 z-40">
+      <div data-header-bar className="frame flex items-center justify-between py-3.5">
+        <Link href="#inicio" className="focus-ring flex items-center gap-2.5 rounded-full">
+          <span className="t-small font-semibold tracking-tight" translate="no">
+            {profile.name}
+          </span>
         </Link>
 
-        <nav aria-label="Navegação principal" className="hidden gap-6 text-sm text-muted sm:flex">
+        <nav aria-label="Navegação principal" className="t-small hidden gap-7 text-muted sm:flex">
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="focus-ring rounded transition-colors hover:text-foreground"
+              data-page-link={link.href.slice(1)}
+              className="nav-link focus-ring rounded transition-colors hover:text-foreground"
             >
               {link.label}
             </a>
@@ -85,22 +126,9 @@ export function Header() {
           onClick={() => setIsOpen((prev) => !prev)}
           aria-expanded={isOpen}
           aria-controls="mobile-menu"
-          aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
-          className="focus-ring flex h-9 w-9 flex-col items-center justify-center gap-1.5 rounded-full border border-border sm:hidden"
+          className="focus-ring t-small min-h-11 rounded-full px-3 font-semibold sm:hidden"
         >
-          <span
-            className={`h-0.5 w-4 bg-foreground transition-transform ${
-              isOpen ? "translate-y-2 rotate-45" : ""
-            }`}
-          />
-          <span
-            className={`h-0.5 w-4 bg-foreground transition-opacity ${isOpen ? "opacity-0" : ""}`}
-          />
-          <span
-            className={`h-0.5 w-4 bg-foreground transition-transform ${
-              isOpen ? "-translate-y-2 -rotate-45" : ""
-            }`}
-          />
+          {isOpen ? "Fechar" : "Menu"}
         </button>
       </div>
 
@@ -109,7 +137,7 @@ export function Header() {
         ref={panelRef}
         aria-label="Navegação principal (mobile)"
         aria-hidden={!isOpen}
-        className={`flex origin-top flex-col gap-1 overflow-hidden border-t border-border/60 bg-background px-6 transition-[max-height,opacity] motion-safe:duration-200 sm:hidden ${
+        className={`frame flex origin-top flex-col gap-1 overflow-hidden transition-[max-height,opacity] motion-safe:duration-200 sm:hidden ${
           isOpen ? "max-h-96 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
         }`}
       >
@@ -118,9 +146,10 @@ export function Header() {
             key={link.href}
             ref={index === 0 ? firstLinkRef : undefined}
             href={link.href}
+            data-page-link={link.href.slice(1)}
             onClick={close}
             tabIndex={isOpen ? 0 : -1}
-            className="focus-ring rounded-lg px-2 py-3 text-base text-muted transition-colors hover:bg-surface hover:text-foreground"
+            className="nav-link focus-ring t-lead rounded py-2 text-muted transition-colors hover:text-foreground"
           >
             {link.label}
           </a>

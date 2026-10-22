@@ -33,10 +33,11 @@ A landing page Perol (F5 Flotador e Lavix) segue o mesmo formato em [`/projetos/
 
 ## Rolagem nas seções Projetos e Trajetória
 
-As duas seções compartilham um laço de rolagem (`src/lib/scroll-orchestrator.ts`): um listener de scroll, um `requestAnimationFrame` por quadro, um `ResizeObserver` e uma consulta de movimento reduzido, sem biblioteca de animação.
+A home inteira compartilha um laço de rolagem (`src/lib/scroll-orchestrator.ts`): um listener de scroll, um `requestAnimationFrame` por quadro, um `ResizeObserver` e uma consulta de movimento reduzido, sem biblioteca de animação.
 
-- **Projetos** (`src/components/projects/`): no desktop com altura suficiente, a seção fica fixa e a rolagem vertical desloca os painéis na horizontal; no celular, tablet ou janela baixa, vira um trilho com gesto, botões e contador; com movimento reduzido, sem JavaScript, na impressão ou em "Ver todos em lista", é uma lista vertical.
-- **Trajetória** (`src/components/Timeline.tsx`): o eixo se preenche conforme a leitura e destaca a experiência em foco, sem fixar nada. Os dados ficam em `experiences` e `education`, em `src/lib/data.ts`.
+- **Capítulos**: campos claros e escuros separam as seções. Um notebook desenhado em CSS 3D abre a tampa com a rolagem para revelar a demonstração do SimpleStock. O botão “Abrir notebook” permite usar a cena sem rolar; com movimento reduzido ou sem JavaScript, a tela já aparece aberta. O vídeo preserva a proporção original e tem controles nativos. O menu acompanha o capítulo atual; os fundos alternam entre claro, azul profundo e azul de contato.
+- **Projetos** (`src/components/projects/`): painéis verticais sobem sobre o anterior no desktop e no celular. O título fica preso quando todos os painéis cabem na tela; painéis maiores permitem ler todo o conteúdo antes de parar. O foco por teclado revela o painel correspondente. Com movimento reduzido, sem JavaScript ou na impressão, a apresentação segue como lista vertical. O Agendamento de Salas aparece por último, identificado como primeiro projeto.
+- **Trajetória** (`src/components/Timeline.tsx`): título centralizado, sem retrato; a experiência em leitura recebe destaque no período, sem fixar a seção. Os dados ficam em `experiences` e `education`, em `src/lib/data.ts`.
 
 ## Projetos em destaque
 

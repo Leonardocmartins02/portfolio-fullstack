@@ -9,18 +9,22 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Canais RGB definidos por capítulo em globals.css (escuro por padrão,
+      // .chapter-light inverte), para as classes servirem nos dois campos.
       colors: {
-        background: "#0B0C14",
-        surface: "#14151F",
-        border: "#26283A",
-        foreground: "#F4F3F8",
-        muted: "#9A98A8",
-        // DEFAULT para formas (eixo, marcadores, contornos); text para texto roxo,
-        // com contraste maior sobre o fundo escuro.
-        accent: { DEFAULT: "#7C6CF6", text: "#B7A7FF" },
+        background: "rgb(var(--ground) / <alpha-value>)",
+        surface: "rgb(var(--surface) / <alpha-value>)",
+        border: "rgb(var(--line) / <alpha-value>)",
+        foreground: "rgb(var(--ink) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        // Azul de ação do DESIGN.md da Vercel, ajustado ao campo (contraste AA nos dois).
+        accent: {
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          text: "rgb(var(--accent) / <alpha-value>)",
+        },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
       },
       maxWidth: {
         content: "72rem",
