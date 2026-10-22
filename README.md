@@ -35,7 +35,7 @@ A landing page Perol (F5 Flotador e Lavix) segue o mesmo formato em [`/projetos/
 
 A home inteira compartilha um laço de rolagem (`src/lib/scroll-orchestrator.ts`): um listener de scroll, um `requestAnimationFrame` por quadro, um `ResizeObserver` e uma consulta de movimento reduzido, sem biblioteca de animação.
 
-- **Capítulos**: campos escuros de profundidades diferentes separam as seções. Um notebook desenhado em CSS 3D abre a tampa com a rolagem para revelar a demonstração do SimpleStock. O botão “Abrir notebook” permite usar a cena sem rolar; com movimento reduzido ou sem JavaScript, a tela já aparece aberta. O vídeo preserva a proporção original e tem controles nativos. O menu acompanha o capítulo atual; os fundos alternam entre o quase preto, o elevado (um tom acima) e o azul profundo do contato.
+- **Capítulos**: campos escuros de profundidades diferentes separam as seções. No hero, um notebook desenhado em CSS 3D já abre no dashboard do SimpleStock, com cards do próprio sistema em volta (`src/components/hero/`). Na rolagem, os cards se recolhem para a tela; com mouse, a cena inclina de leve. Com movimento reduzido, tudo fica parado no estado inicial. O menu acompanha o capítulo atual; os fundos alternam entre o quase preto, o elevado (um tom acima) e o azul profundo do contato.
 - **Projetos** (`src/components/projects/`): painéis verticais sobem sobre o anterior no desktop e no celular. O título fica preso quando todos os painéis cabem na tela; painéis maiores permitem ler todo o conteúdo antes de parar. O foco por teclado revela o painel correspondente. Com movimento reduzido, sem JavaScript ou na impressão, a apresentação segue como lista vertical. O Agendamento de Salas aparece por último, identificado como primeiro projeto.
 - **Trajetória** (`src/components/Timeline.tsx`): título centralizado, sem retrato; a experiência em leitura recebe destaque no período, sem fixar a seção. Os dados ficam em `experiences` e `education`, em `src/lib/data.ts`.
 
@@ -116,6 +116,7 @@ src/
     api/projects/            -> API de CRUD de projetos
     api/auth/[...nextauth]  -> rota do NextAuth
   components/                -> secoes da pagina publica (Hero, About, etc)
+  components/hero/           -> notebook em CSS 3D e cards do SimpleStock do hero
   components/admin/          -> componentes do painel admin
   lib/prisma.ts               -> cliente do Prisma (singleton)
   lib/auth.ts                 -> configuracao do NextAuth

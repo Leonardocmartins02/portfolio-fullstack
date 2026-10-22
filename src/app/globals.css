@@ -261,7 +261,15 @@ h3 {
     text-underline-offset: 0.4em;
   }
 
-  /* ---------- Hero: demonstração inteira em um notebook 3D ---------- */
+  /* ---------- Hero: o nome e o SimpleStock num notebook aberto ----------
+     Notebook e cards em CSS 3D (components/hero). A cena se mede em cqw da
+     figura, então o desenho é o mesmo em qualquer largura. A "luz" é o tom de
+     cada face: a base, voltada para cima, é a mais clara; a lateral direita, a
+     mais escura; a borda de alumínio da tampa recorta o notebook do fundo. */
+
+  .hero {
+    overflow-x: clip;
+  }
 
   .hero__stage {
     padding-block: clamp(28px, 4vh, 48px);
@@ -283,107 +291,362 @@ h3 {
   }
 
   .hero__demo {
-    width: min(100%, 720px);
-    margin: 32px auto 0;
+    container-type: inline-size;
+    width: min(100%, 760px);
+    margin: 24px auto 0;
+  }
+
+  .hero__scene {
+    --w: 62cqw; /* largura da tampa */
+    --cam-x: -11deg; /* câmera um pouco acima (topo da tampa vem para a frente) */
+    --cam-y: -20deg; /* tela voltada para o texto */
+    --lid: 8deg; /* abertura além dos 90° */
+    --deck: calc(var(--w) * 0.62);
+    --thick: calc(var(--w) * 0.016);
+    position: relative;
+    aspect-ratio: 10 / 7;
+  }
+
+  .laptop-view {
+    position: absolute;
+    inset: 0;
+    perspective: 320cqw;
   }
 
   .laptop {
-    perspective: 1400px;
-    perspective-origin: 50% -300px;
-    padding-inline: 4%;
-    padding-bottom: 14px;
+    position: absolute;
+    top: 9%;
+    left: calc(50% - var(--w) / 2);
+    width: var(--w);
+    transform-style: preserve-3d;
+  }
+
+  .laptop__body {
+    transform-style: preserve-3d;
+    transform-origin: 50% 100%;
+    transform: rotateX(var(--cam-x)) rotateY(var(--cam-y));
   }
 
   .laptop__lid {
     position: relative;
-    transform-origin: center bottom;
-    transform: rotateX(0deg);
     transform-style: preserve-3d;
-    background: #253650;
-    padding: 10px;
-    border-radius: 14px 14px 4px 4px;
+    transform-origin: 50% 100%;
+    transform: rotateX(var(--lid));
+    padding: calc(var(--w) * 0.006);
+    border-radius: calc(var(--w) * 0.032) calc(var(--w) * 0.032) calc(var(--w) * 0.008) calc(var(--w) * 0.008);
+    background: #4a5361;
   }
 
-  .laptop__lid::before {
-    content: "";
+  .laptop__bezel {
+    padding: calc(var(--w) * 0.02) calc(var(--w) * 0.02) calc(var(--w) * 0.03);
+    border-radius: calc(var(--w) * 0.027) calc(var(--w) * 0.027) calc(var(--w) * 0.004) calc(var(--w) * 0.004);
+    background: #090c11;
+  }
+
+  /* O print do dashboard já é 16:10, a proporção da tela. */
+  .hero__picture {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #f2f4f7;
+  }
+
+  .laptop__lid-side {
     position: absolute;
-    top: 3px;
-    left: calc(50% - 2px);
-    width: 4px;
-    height: 4px;
+    top: calc(var(--w) * 0.02);
+    bottom: 0;
+    left: 100%;
+    width: calc(var(--w) * 0.012);
+    transform-origin: 0 50%;
+    transform: rotateY(90deg);
+    background: #1b2028;
+  }
+
+  .laptop__deck {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: var(--deck);
+    transform-origin: 50% 0;
+    transform: rotateX(90deg);
+    border-radius: 0 0 calc(var(--w) * 0.024) calc(var(--w) * 0.024);
+    background: #3b4350;
+  }
+
+  .laptop__keys {
+    position: absolute;
+    top: 7%;
+    left: 8%;
+    right: 8%;
+    height: 44%;
+    display: grid;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    gap: calc(var(--w) * 0.005);
+    padding: calc(var(--w) * 0.007);
+    border-radius: calc(var(--w) * 0.008);
+    background: #20262e;
+  }
+
+  .laptop__keys span {
+    border-radius: calc(var(--w) * 0.003);
+    background: #2f3641;
+  }
+
+  .laptop__keys .laptop__space {
+    grid-column: span 6;
+  }
+
+  .laptop__pad {
+    position: absolute;
+    top: 58%;
+    left: 31%;
+    width: 38%;
+    height: 33%;
+    border-radius: calc(var(--w) * 0.014);
+    background: #353d49;
+  }
+
+  .laptop__front {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: var(--thick);
+    transform: translateZ(var(--deck));
+    border-radius: 0 0 calc(var(--w) * 0.014) calc(var(--w) * 0.014);
+    background: #262c35;
+  }
+
+  .laptop__side {
+    position: absolute;
+    top: 100%;
+    left: 100%;
+    width: var(--deck);
+    height: var(--thick);
+    transform-origin: 0 0;
+    transform: rotateY(-90deg);
+    background: #1a1f27;
+  }
+
+  /* ---------- Cards do dashboard ----------
+     Os tons, raios e tamanhos são os do protótipo do SimpleStock (v2), em cqw
+     para acompanhar a cena. */
+
+  .stock-card {
+    position: absolute;
+    width: 29cqw;
+  }
+
+  /* O de trás passa por baixo do canto da tampa; os da frente cobrem as bordas.
+     Nenhum sai do palco, para não invadir a margem nem chegar perto do texto. */
+  .stock-card[data-card="units"] { top: -2%; left: 0; }
+  .stock-card[data-card="restock"] { top: 55%; left: 0; }
+  .stock-card[data-card="moves"] { top: 27%; right: 0; }
+  .stock-card[data-card="activity"] { top: 79%; right: 5%; width: 40cqw; }
+
+  .stock-card__body {
+    display: grid;
+    gap: 1.1cqw;
+    padding: 2cqw 2.3cqw;
+    border-radius: 1.8cqw;
+    background: #fff;
+    color: #111827;
+    font-size: clamp(10px, 1.62cqw, 13px);
+    line-height: 1.4;
+  }
+
+  .stock-card[data-dark] .stock-card__body {
+    background: #111318;
+    color: #fff;
+  }
+
+  .stock-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1cqw;
+  }
+
+  .stock-card__label {
+    font-weight: 500;
+    color: #4b5563;
+  }
+
+  .stock-card__chip {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 4cqw;
+    height: 4cqw;
+    border-radius: 1.1cqw;
+    border: 1px solid #e4e7ec; /* taste-skill-ignore: contorno do próprio componente do SimpleStock. */
+    background: #f8f9fb;
+    color: #4b5563;
+  }
+
+  .stock-card__chip[data-tone="accent"] {
+    border-color: transparent;
+    background: #eff6ff;
+    color: #2563eb;
+  }
+
+  .stock-card__chip[data-tone="warn"] {
+    border-color: transparent;
+    background: rgb(245 158 11 / 0.16);
+    color: #fbbf24;
+  }
+
+  .stock-card__icon {
+    width: 2.1cqw;
+    height: 2.1cqw;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .stock-card__value {
+    font-size: clamp(18px, 3.4cqw, 26px);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stock-card__value small {
+    margin-left: 0.3em;
+    font-size: 0.5em;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: #6b7280;
+  }
+
+  .stock-card__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em 0.6em;
+    font-size: clamp(10px, 1.55cqw, 12px);
+    color: #4b5563;
+  }
+
+  .stock-card__foot--split {
+    display: grid;
+    justify-items: start;
+  }
+
+  .stock-card[data-dark] :is(.stock-card__label, .stock-card__foot, small) {
+    color: #c9cbd1;
+  }
+
+  .stock-card[data-dark] .stock-card__foot > span {
+    color: #fff;
+  }
+
+  .stock-card__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    height: 1.8em;
+    padding: 0 0.65em;
+    border-radius: 9999px;
+    border: 1px solid #e4e7ec; /* taste-skill-ignore: contorno do próprio componente do SimpleStock. */
+    background: #f8f9fb;
+    font-weight: 600;
+    color: #4b5563;
+  }
+
+  .stock-card__pill .stock-card__icon,
+  .stock-card__move .stock-card__icon {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .stock-card__dot {
+    display: inline-block;
+    width: 0.62em;
+    height: 0.62em;
+    margin-right: 0.6em;
     border-radius: 50%;
-    background: #0a1220;
+    background: #f59e0b;
   }
 
-  .laptop__mark {
-    position: absolute;
-    inset: 0;
+  .stock-card__dot[data-tone="out"] {
+    background: #ef4444;
+  }
+
+  .stock-card__move {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .stock-card__move > span {
     display: grid;
     place-items: center;
-    color: #a9bdd6;
-    font-size: 32px;
-    font-weight: 600;
-    letter-spacing: -0.05em;
-    opacity: var(--cover-opacity, 0);
-    pointer-events: none;
+    width: 1.85em;
+    height: 1.85em;
+    border-radius: 0.45em;
+    background: #ecfdf5;
+    color: #047857;
   }
 
-  .hero__picture {
-    background: #07101d;
-    aspect-ratio: 16 / 9;
+  .stock-card__move[data-tone="out"] > span {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+
+  .stock-card__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5cqw;
+  }
+
+  .stock-card__event {
+    display: grid;
+    min-width: 0;
+  }
+
+  .stock-card__event-title {
+    font-weight: 500;
+  }
+
+  .stock-card__event-meta {
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.86em;
+    color: #6b7280;
   }
 
-  .hero__picture video {
-    display: block;
-    height: 100%;
-    width: 100%;
-    object-fit: contain;
-  }
-
-  .laptop__base {
-    height: 14px;
-    margin-inline: -4%;
-    background: #8c9bad;
-    border-radius: 2px 2px 50% 50% / 2px 2px 12px 12px;
-    position: relative;
-  }
-
-  .laptop__base::after {
-    content: "";
-    display: block;
-    width: 16%;
-    height: 5px;
-    margin: auto;
-    background: #42546b;
-    border-radius: 0 0 6px 6px;
+  .stock-card__delta {
+    font-weight: 600;
+    white-space: nowrap;
+    color: #047857;
   }
 
   .hero__caption {
     position: relative;
     z-index: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 12px;
+    max-width: 44ch;
+    margin-top: 8px;
   }
-
-  .hero__caption p { max-width: 38ch; }
-
-  .hero__controls { display: flex; flex-wrap: wrap; gap: 8px; }
 
   @media (prefers-reduced-motion: no-preference) {
     .js .hero::after { content: ""; display: block; height: 45svh; }
     .js .hero__stage { position: sticky; top: var(--header-offset, 4rem); }
-    .js .laptop__lid { transform: rotateX(var(--lid-angle, 88deg)); }
-    .js .laptop__mark { opacity: var(--cover-opacity, 1); }
-    .js .hero__picture { opacity: var(--screen-opacity, 0); }
+    /* Quatro passos, tudo assentado até 1,2s. O notebook só usa transform:
+       opacidade num pai preserve-3d achataria a cena. */
     .hero__headline { animation: hero-arrive 700ms var(--ease-out) both; }
     .hero__aside { animation: hero-arrive 850ms var(--ease-out) both; }
-    .laptop[data-manual] .laptop__lid { transition: transform 900ms var(--ease-expo); }
-    .laptop[data-manual] .hero__picture { transition: opacity 600ms ease; }
+    .laptop { animation: laptop-arrive 1000ms var(--ease-expo) 150ms both; }
+    .stock-card__body { animation: hero-arrive 700ms var(--ease-out) 480ms both; }
   }
 
   @keyframes hero-arrive {
@@ -391,20 +654,87 @@ h3 {
     to { opacity: 1; transform: translateY(0); }
   }
 
-  @media (min-width: 1024px) and (max-height: 850px) {
-    .hero__demo { width: min(66vw, 680px); margin-top: 16px; }
-    .hero__headline { font-size: clamp(44px, 5vw, 68px); }
-    .hero__stage { padding-block: 24px; }
+  @keyframes laptop-arrive {
+    from { scale: 0.96; translate: 0 16px; }
+    to { scale: 1; translate: 0 0; }
   }
 
+  /* Tablet: cena embaixo do texto, três cards (sem o de baixo, a cena encurta). */
+  @media (max-width: 1023px) {
+    .hero__scene { aspect-ratio: 10 / 6.4; }
+    .stock-card[data-card="activity"] { display: none; }
+  }
+
+  /* Desktop: texto à esquerda, cena à direita, na altura da tela. */
+  @media (min-width: 1024px) {
+    .hero__stage {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--gutter);
+      align-items: center;
+      min-height: calc(100svh - var(--header-offset, 4rem));
+    }
+
+    .hero__copy {
+      grid-column: 1 / span 5;
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 28px;
+    }
+
+    .hero__aside { justify-self: start; }
+
+    .hero__headline { font-size: clamp(48px, 5vw, 72px); }
+
+    .hero__demo {
+      grid-column: 6 / span 7;
+      justify-self: end;
+      /* A cena é 4:3: em telas baixas, a altura disponível limita a largura. */
+      width: min(100%, 900px, calc((100svh - var(--header-offset, 4rem) - 9rem) * 4 / 3));
+      margin: 0;
+    }
+  }
+
+  /* Celular: notebook quase de frente e dois cards planos, em fila, embaixo. */
   @media (max-width: 639px) {
     .hero__copy { grid-template-columns: 1fr; gap: 16px; }
     .hero__aside { justify-self: start; gap: 16px; }
     .hero__aside .t-lead { font-size: 18px; }
-    .hero__demo { margin-top: 24px; }
-    .hero__caption { align-items: start; }
-    .hero__caption p { font-size: 16px; }
-    .laptop__lid { padding: 5px; border-radius: 8px 8px 2px 2px; }
+
+    .hero__scene {
+      --w: 78cqw;
+      --cam-x: -10deg;
+      --cam-y: -6deg;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      align-items: start;
+      aspect-ratio: auto;
+      padding-top: 70cqw;
+    }
+
+    .laptop-view { bottom: auto; height: 70cqw; }
+    .laptop { top: 2cqw; }
+
+    .stock-card[data-card="units"] { display: none; }
+
+    .stock-card[data-card] {
+      position: static;
+      width: auto;
+    }
+
+    .stock-card__body {
+      gap: 8px;
+      height: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .stock-card__chip { width: 26px; height: 26px; border-radius: 8px; }
+    .stock-card__icon { width: 15px; height: 15px; }
+    .stock-card__value { font-size: 22px; }
+    .stock-card__foot { font-size: 12px; }
   }
 
   @media (max-height: 740px) and (max-width: 1023px) {
@@ -759,7 +1089,6 @@ h3 {
 
 @media print {
   .site-header,
-  .hero__pause,
   .projects__count {
     display: none !important;
   }

@@ -1,70 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { profile } from "@/lib/data";
-import { registerScrollController, useReducedMotion } from "@/lib/scroll-orchestrator";
+import { useMediaQuery, useReducedMotion } from "@/lib/scroll-orchestrator";
+import { Laptop } from "@/components/hero/Laptop";
+import { BackCards, FrontCards } from "@/components/hero/StockCards";
+import { useHeroScene } from "@/components/hero/useHeroScene";
 
-// A demonstração mantém a proporção original: toda a interface fica visível.
+// O SimpleStock é a prova ao lado do nome: o notebook já abre no dashboard, e os
+// cards dele ficam em volta, em profundidade. A demonstração em vídeo fica nos
+// Projetos.
 export function Hero() {
   const reducedMotion = useReducedMotion();
+  const finePointer = useMediaQuery("(hover: hover) and (pointer: fine)");
   const sectionRef = useRef<HTMLElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
   const laptopRef = useRef<HTMLDivElement>(null);
-  const [manualOpen, setManualOpen] = useState(false);
-  const [opened, setOpened] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [choice, setChoice] = useState<"play" | "pause" | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const screenReady = reducedMotion || opened || manualOpen;
-  const shouldPlay = screenReady && (choice === "play" || (choice === null && !reducedMotion));
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const laptop = laptopRef.current;
-    if (!section || !laptop || reducedMotion) return;
-    let start = 0;
-    let span = 1;
-    let wasOpen = false;
-    let lastProgress = -1;
-    const unregister = registerScrollController({
-      element: section,
-      measure(frame) {
-        start = section.getBoundingClientRect().top + frame.scrollY;
-        const shortScreen = frame.viewportHeight <= 740 && window.innerWidth < 1024;
-        span = Math.min(360, frame.viewportHeight * (shortScreen ? 0.25 : 0.4));
-      },
-      write(frame) {
-        const p = manualOpen ? 1 : Math.min(1, Math.max(0, (frame.scrollY - start) / span));
-        if (p === lastProgress) return;
-        lastProgress = p;
-        laptop.style.setProperty("--lid-angle", `${88 - 88 * p}deg`);
-        laptop.style.setProperty("--cover-opacity", `${1 - Math.min(1, p * 3)}`);
-        laptop.style.setProperty("--screen-opacity", `${Math.min(1, Math.max(0, (p - 0.25) / 0.5))}`);
-        const ready = p >= 0.9;
-        if (ready !== wasOpen) { wasOpen = ready; setOpened(ready); }
-      },
-    });
-    return () => {
-      unregister();
-      laptop.style.removeProperty("--lid-angle");
-      laptop.style.removeProperty("--screen-opacity");
-      laptop.style.removeProperty("--cover-opacity");
-    };
-  }, [manualOpen, reducedMotion]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (!shouldPlay) {
-      video.pause();
-      return;
-    }
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) video.play().catch(() => setPlaying(false));
-      else video.pause();
-    }, { threshold: 0.15 });
-    observer.observe(video);
-    return () => observer.disconnect();
-  }, [shouldPlay]);
+  useHeroScene(sectionRef, sceneRef, laptopRef, { enabled: !reducedMotion, finePointer });
 
   return (
     <section ref={sectionRef} id="inicio" data-chapter="dark" className="hero chapter chapter-dark">
@@ -77,48 +32,24 @@ export function Hero() {
           </div>
         </div>
         <figure className="hero__demo">
-          <div ref={laptopRef} className="laptop" data-manual={manualOpen ? "" : undefined}>
-            <div className="laptop__lid">
-              <span className="laptop__mark" aria-hidden="true">LM</span>
-          <div className="hero__picture">
-            <video
-              ref={videoRef}
-              muted
-              loop
-              playsInline
-              controls
-              onFocus={() => setManualOpen(true)}
-              preload="metadata"
-              width={1440}
-              height={1080}
-              poster="/projects/simplestock-v2-poster.png"
-              aria-label="Demonstração do SimpleStock: dashboard, produtos e registro de uma movimentação de estoque"
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-            >
-              <source src="/projects/simplestock-v2-demo.webm" type="video/webm" />
-            </video>
+          <div ref={sceneRef} className="hero__scene">
+            <BackCards />
+            <Laptop ref={laptopRef}>
+              <div className="hero__picture">
+                <Image
+                  src="/projects/simplestock-v2-dashboard.png"
+                  alt="Dashboard do SimpleStock com indicadores, evolução do estoque em 30 dias, status e produtos para repor"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 36vw, (min-width: 640px) 460px, 80vw"
+                />
+              </div>
+            </Laptop>
+            <FrontCards />
           </div>
-            </div>
-            <div className="laptop__base" aria-hidden="true" />
-          </div>
-          <figcaption className="hero__caption">
-            <p className="t-small">{screenReady ? "SimpleStock em uso — do dashboard à movimentação de estoque." : "Role para abrir o notebook e explorar o SimpleStock."}</p>
-            <div className="hero__controls">
-            {!reducedMotion && !manualOpen && (
-              <button type="button" onClick={() => setManualOpen(true)} className="button focus-ring">
-                Abrir notebook
-              </button>
-            )}
-            <button type="button" onClick={() => {
-                setManualOpen(true);
-                setChoice(playing ? "pause" : "play");
-                if (playing) videoRef.current?.pause();
-                else videoRef.current?.play().catch(() => setPlaying(false));
-              }} className="hero__pause button button--quiet focus-ring">
-              {playing ? "Pausar vídeo" : "Reproduzir vídeo"}
-            </button>
-            </div>
+          <figcaption className="hero__caption t-small">
+            SimpleStock, sistema de estoque com React, Express e PostgreSQL.{" "}
+            <Link href="/projetos/simplestock" className="link focus-ring">Ver o projeto</Link>
           </figcaption>
         </figure>
       </div>
