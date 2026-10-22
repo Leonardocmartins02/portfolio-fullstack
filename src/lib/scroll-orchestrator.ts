@@ -10,6 +10,11 @@ import { useSyncExternalStore } from "react";
 export type ScrollFrame = {
   scrollY: number;
   viewportHeight: number;
+  /**
+   * Menor altura do viewport (100svh): no celular nao muda quando a barra de
+   * endereco aparece ou some durante a rolagem.
+   */
+  smallViewportHeight: number;
   /** Altura do cabecalho fixo (mesmo valor do scroll-padding das ancoras). */
   headerOffset: number;
   maxScroll: number;
@@ -34,12 +39,15 @@ let frameId = 0;
 let dirty = true;
 let headerOffset = 0;
 let maxScroll = 0;
+let smallViewportHeight = 0;
+let viewportProbe: HTMLElement | null = null;
 let resizeObserver: ResizeObserver | null = null;
 
 function currentFrame(): ScrollFrame {
   return {
     scrollY: window.scrollY,
     viewportHeight: window.innerHeight,
+    smallViewportHeight: smallViewportHeight || window.innerHeight,
     headerOffset,
     maxScroll,
   };
@@ -70,6 +78,7 @@ function run(): boolean {
   if (dirty) {
     dirty = false;
     measureHeader();
+    smallViewportHeight = viewportProbe?.offsetHeight ?? 0;
     maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const frame = currentFrame();
     for (const controller of controllers) {
@@ -121,6 +130,11 @@ function onLoadCapture(event: Event) {
 }
 
 function attach() {
+  viewportProbe = document.createElement("div");
+  viewportProbe.setAttribute("aria-hidden", "true");
+  viewportProbe.style.cssText =
+    "position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none";
+  document.body.appendChild(viewportProbe);
   document.addEventListener("scroll", requestFrame, { capture: true, passive: true });
   window.addEventListener("resize", invalidateScroll);
   document.addEventListener("load", onLoadCapture, true);
@@ -138,6 +152,8 @@ function detach() {
   document.removeEventListener("load", onLoadCapture, true);
   resizeObserver?.disconnect();
   resizeObserver = null;
+  viewportProbe?.remove();
+  viewportProbe = null;
   document.fonts?.removeEventListener?.("loadingdone", invalidateScroll);
   if (frameId) cancelAnimationFrame(frameId);
   frameId = 0;

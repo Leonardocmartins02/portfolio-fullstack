@@ -2,14 +2,13 @@ import { prisma } from "@/lib/prisma";
 import type { Project } from "@prisma/client";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
-import { Stats } from "@/components/Stats";
 import { About } from "@/components/About";
-import { Skills } from "@/components/Skills";
 import { Projects } from "@/components/Projects";
 import { Timeline } from "@/components/Timeline";
+import { Skills } from "@/components/Skills";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import { Reveal } from "@/components/Reveal";
 
 // Revalida a pagina a cada 60s: sem isso o Next gera a home so no deploy e
 // projetos cadastrados no painel nao aparecem ate o proximo redeploy.
@@ -30,24 +29,19 @@ export default async function Home() {
   return (
     <>
       <Header />
+      {/* Cada seção é um capítulo com o próprio campo de cor (fundo, elevado ou azul),
+          com corte seco entre eles; o hero segura a imagem enquanto o Sobre sobe
+          por cima, e os projetos sobem um sobre o outro. */}
       <main id="main">
         <Hero />
-        <Stats />
-        <ScrollReveal>
-          <About />
-        </ScrollReveal>
-        <ScrollReveal>
-          <Skills />
-        </ScrollReveal>
-        {/* Projetos e Trajetória têm movimento ligado à rolagem; um fade por cima
-            esconderia texto e atrapalharia as medidas do sticky. */}
+        <About />
         <Projects projects={projects} />
         <Timeline />
-        <ScrollReveal>
-          <Contact />
-        </ScrollReveal>
+        <Skills />
+        <Contact />
       </main>
       <Footer />
+      <Reveal />
     </>
   );
 }

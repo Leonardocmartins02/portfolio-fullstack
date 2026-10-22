@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -13,112 +14,143 @@ export type ProjectPanelData = {
   name: string;
   title: string;
   category: string;
-  badge?: string;
+  /** Um fato curto na mesma linha do nome ("Projeto principal", "Primeiro projeto"). */
+  fact?: string;
   description: string;
   highlight?: { label: string; text: string };
   techs?: string[];
   /** alt vazio quando a imagem só repete o texto do painel. */
   image: { src: string; alt: string } | null;
+  /** Demonstração em vídeo: toma o lugar da imagem e mantém a proporção original. */
+  video?: { src: string; poster: string; width: number; height: number; label: string };
   actions: ProjectAction[];
-  featured?: boolean;
 };
 
-const actionClass =
-  "focus-ring inline-flex items-center gap-1 rounded text-sm font-medium text-accent-text underline decoration-accent-text/40 underline-offset-4 transition-colors hover:decoration-accent-text";
+// "React, Express e Vitest": lista em frase, sem caixas nem separadores.
+function listInWords(items: string[]) {
+  return items.length < 2
+    ? items.join("")
+    : `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+}
 
+// Um painel de tela cheia: a linha do nome fica no mesmo lugar em todos, então
+// a rolagem lê como virar pranchas de um livro. Os campos alternam o fundo e o elevado.
 export function ProjectPanel({
   project,
-  headingId,
+  index,
+  total,
+  tone,
   loading,
 }: {
   project: ProjectPanelData;
-  headingId: string;
+  index: number;
+  total: number;
+  tone: "raised" | "dark";
   loading: "lazy" | "eager";
 }) {
-  return (
-    <article
-      aria-labelledby={headingId}
-      className={`project-panel ${project.featured ? "border-accent/40" : "border-border"}`}
-    >
-      <div className="project-panel__layout">
-        <div className="project-panel__media">
-          <div className="project-panel__frame">
-            {project.image ? (
-              <Image
-                src={project.image.src}
-                alt={project.image.alt}
-                fill
-                loading={loading}
-                sizes="(min-width: 64rem) 600px, 92vw"
-                className="object-contain"
-              />
-            ) : (
-              <span className="text-xs text-muted">Sem imagem</span>
-            )}
-          </div>
-        </div>
+  const headingId = `projeto-${project.id}`;
+  const second = { "--i": 1 } as CSSProperties;
 
-        <div className="project-panel__body">
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="text-xs font-medium uppercase tracking-wide text-accent-text">
-              {project.category}
-            </span>
-            {project.badge ? (
-              <span className="rounded-full border border-accent/50 px-2.5 py-0.5 text-xs font-medium text-foreground">
-                {project.badge}
-              </span>
-            ) : null}
-          </p>
-          <h3
-            id={headingId}
-            className="mt-3 text-xl font-semibold leading-snug text-foreground md:text-2xl"
-          >
+  return (
+    <li
+      className={`project-slot chapter chapter-${tone}`}
+      data-chapter={tone}
+      data-panel-index={index}
+    >
+      <article aria-labelledby={headingId} className="project">
+        <div className="project__row" data-reveal>
+          <p className="project__kind t-small text-muted">{project.category}</p>
+          <h3 id={headingId} className="project__name t-lead font-semibold" translate="no">
             {project.title}
           </h3>
-          <p className="mt-3 text-base leading-relaxed text-muted">{project.description}</p>
+          <p className="project__fact t-small text-muted">
+            <span className="sr-only">
+              Projeto {index + 1} de {total}.{" "}
+            </span>
+            {project.fact}
+          </p>
+        </div>
+
+        <div className="project__text space-y-4" data-reveal style={second}>
+          <p className="t-body">{project.description}</p>
           {project.highlight ? (
-            <p className="mt-3 text-base leading-relaxed text-muted">
-              <span className="font-medium text-foreground">{project.highlight.label}:</span>{" "}
+            <p className="t-body">
+              <span className="font-semibold">{project.highlight.label}:</span>{" "}
               {project.highlight.text}
             </p>
           ) : null}
           {project.techs?.length ? (
-            <ul aria-label="Tecnologias" className="mt-4 flex flex-wrap gap-2">
-              {project.techs.map((tech) => (
-                <li
-                  key={tech}
-                  className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground/85"
-                >
-                  {tech}
-                </li>
-              ))}
-            </ul>
+            <p className="t-small text-muted">Feito com {listInWords(project.techs)}.</p>
           ) : null}
-          <div className="mt-auto flex flex-wrap gap-x-6 gap-y-3 pt-6">
-            {project.actions.map((action) =>
-              action.external ? (
-                <a
-                  key={action.href}
-                  href={action.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={actionClass}
-                >
-                  {action.label}
-                  <span className="sr-only">: {project.name}</span>
-                  <span aria-hidden="true">↗</span>
-                </a>
-              ) : (
-                <Link key={action.href} href={action.href} className={actionClass}>
-                  {action.label}
-                  <span className="sr-only">: {project.name}</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-              ),
-            )}
-          </div>
+          {project.actions.length ? (
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
+              {project.actions.map((action, i) => {
+                // A página do projeto (demonstração interna) é a ação principal.
+                const primary = i === 0 && !action.external;
+                const className = primary ? "button focus-ring" : "link focus-ring rounded t-body";
+                const label = (
+                  <>
+                    {action.label}
+                    <span className="sr-only">: {project.name}</span>
+                    {action.external ? <span className="sr-only"> (abre em nova aba)</span> : null}
+                  </>
+                );
+                return action.external ? (
+                  <a
+                    key={action.href}
+                    href={action.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={className}
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <Link key={action.href} href={action.href} className={className}>
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
-      </div>
-    </article>
+
+        <figure
+          className="project__picture"
+          data-reveal="picture"
+          style={
+            project.video
+              ? { ...second, aspectRatio: `${project.video.width} / ${project.video.height}` }
+              : second
+          }
+        >
+          {/* Sem som e em loop; o ProjectsShowcase toca só o vídeo do painel da vez. */}
+          {project.video ? (
+            <video
+              muted
+              loop
+              playsInline
+              controls
+              preload={loading === "eager" ? "metadata" : "none"}
+              width={project.video.width}
+              height={project.video.height}
+              poster={project.video.poster}
+              aria-label={project.video.label}
+            >
+              <source src={project.video.src} type="video/webm" />
+            </video>
+          ) : project.image ? (
+            <Image
+              src={project.image.src}
+              alt={project.image.alt}
+              width={1600}
+              height={1000}
+              loading={loading}
+              sizes="(min-width: 1024px) 58vw, 100vw"
+            />
+          ) : null}
+        </figure>
+      </article>
+    </li>
   );
 }

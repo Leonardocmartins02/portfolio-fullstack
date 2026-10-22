@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Portfólio de Leonardo Martins, desenvolvedor full stack — projetos, trajetória e contato.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0B0C14",
-    theme_color: "#0B0C14",
+    background_color: "#06090F",
+    theme_color: "#06090F",
     icons: [
       {
         src: "/icon.svg",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type CSSProperties, type FormEvent } from "react";
 import { profile } from "@/lib/data";
 
 // "partial" = mensagem salva no banco, mas a notificacao por e-mail falhou.
@@ -39,6 +39,12 @@ export function Contact() {
         const errorBody = await response.json().catch(() => ({}));
         if (errorBody?.details) {
           setFieldErrors(errorBody.details as FieldErrors);
+          const firstInvalid = (["name", "email", "message"] as const).find(
+            (field) => errorBody.details[field]?.length,
+          );
+          if (firstInvalid) {
+            (form.elements.namedItem(firstInvalid) as HTMLElement | null)?.focus();
+          }
         }
         throw new Error(errorBody?.error ?? "Não foi possível enviar a mensagem.");
       }
@@ -58,62 +64,41 @@ export function Contact() {
     }
   }
 
-  return (
-    <section id="contato" className="mx-auto max-w-content px-6 py-16">
-      <span className="text-sm font-medium uppercase tracking-widest text-accent">
-        Contato
-      </span>
-      <h2 className="mb-6 mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
-        Vamos conversar
-      </h2>
+  const [user, domain] = profile.email.split("@");
+  const channels = [
+    { label: "LinkedIn", href: profile.linkedin },
+    { label: "GitHub", href: profile.github },
+    { label: "WhatsApp", href: profile.whatsapp },
+  ];
 
-      <div className="grid gap-10 sm:grid-cols-2">
-        <div className="space-y-2 text-sm text-muted">
-          <p>Prefere falar diretamente? Use um dos canais abaixo:</p>
-          <p>
-            <a href={`mailto:${profile.email}`} className="text-accent hover:underline">
-              {profile.email}
-            </a>
-          </p>
-          <p>
-            <a
-              href={profile.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="focus-ring rounded text-accent hover:underline"
-            >
-              LinkedIn
-            </a>
-          </p>
-          <p>
-            <a
-              href={profile.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="focus-ring rounded text-accent hover:underline"
-            >
-              GitHub
-            </a>
-          </p>
-          <p>
-            <a
-              href={profile.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="focus-ring rounded text-accent hover:underline"
-            >
-              WhatsApp
-            </a>
+  // Capítulo azul de fechamento: o convite e o formulário em cima, o e-mail como
+  // tipografia grande embaixo, os canais nos cantos.
+  return (
+    <section
+      id="contato"
+      aria-labelledby="contato-titulo"
+      data-chapter="blue"
+      className="chapter chapter-blue"
+    >
+      <div className="frame grid-12 gap-y-16 py-[var(--section-gap)]">
+        <div className="col-span-12 lg:col-span-5">
+          <h2 id="contato-titulo" data-reveal className="t-title">
+            Vamos conversar
+          </h2>
+          <p data-reveal style={{ "--i": 1 } as CSSProperties} className="t-lead mt-6 max-w-[24ch]">
+            Para uma vaga, um projeto ou uma conversa sobre tecnologia.
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
           aria-busy={status === "loading"}
-          className="space-y-4"
+          data-reveal
+          style={{ "--i": 2 } as CSSProperties}
+          className="col-span-12 space-y-6 lg:col-span-6 lg:col-start-7"
         >
           <div>
-            <label htmlFor="name" className="mb-1 block text-xs text-muted">
+            <label htmlFor="name" className="t-small block text-muted">
               Nome <span aria-hidden="true">*</span>
               <span className="sr-only"> (obrigatório)</span>
             </label>
@@ -125,17 +110,17 @@ export function Contact() {
               autoComplete="name"
               aria-invalid={Boolean(fieldErrors.name)}
               aria-describedby={fieldErrors.name ? "name-error" : undefined}
-              className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
+              className="field"
             />
             {fieldErrors.name && (
-              <p id="name-error" role="alert" className="mt-1 text-xs text-red-400">
+              <p id="name-error" role="alert" className="t-small mt-1 text-foreground">
                 {fieldErrors.name.join(" ")}
               </p>
             )}
           </div>
           <div>
-            <label htmlFor="email" className="mb-1 block text-xs text-muted">
-              Email <span aria-hidden="true">*</span>
+            <label htmlFor="email" className="t-small block text-muted">
+              E-mail <span aria-hidden="true">*</span>
               <span className="sr-only"> (obrigatório)</span>
             </label>
             <input
@@ -144,23 +129,24 @@ export function Contact() {
               type="email"
               required
               autoComplete="email"
+              spellCheck={false}
               aria-invalid={Boolean(fieldErrors.email)}
               aria-describedby={fieldErrors.email ? "email-error" : undefined}
-              className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
+              className="field"
             />
             {fieldErrors.email && (
-              <p id="email-error" role="alert" className="mt-1 text-xs text-red-400">
+              <p id="email-error" role="alert" className="t-small mt-1 text-foreground">
                 {fieldErrors.email.join(" ")}
               </p>
             )}
           </div>
           <div>
-            <div className="mb-1 flex items-baseline justify-between">
-              <label htmlFor="message" className="block text-xs text-muted">
+            <div className="flex items-baseline justify-between">
+              <label htmlFor="message" className="t-small block text-muted">
                 Mensagem <span aria-hidden="true">*</span>
                 <span className="sr-only"> (obrigatório)</span>
               </label>
-              <span className="text-xs text-muted">
+              <span className="t-small tabular-nums text-muted">
                 {messageLength}/{MESSAGE_MAX_LENGTH}
               </span>
             </div>
@@ -174,10 +160,10 @@ export function Contact() {
               onChange={(event) => setMessageLength(event.target.value.length)}
               aria-invalid={Boolean(fieldErrors.message)}
               aria-describedby={fieldErrors.message ? "message-error" : undefined}
-              className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
+              className="field resize-y"
             />
             {fieldErrors.message && (
-              <p id="message-error" role="alert" className="mt-1 text-xs text-red-400">
+              <p id="message-error" role="alert" className="t-small mt-1 text-foreground">
                 {fieldErrors.message.join(" ")}
               </p>
             )}
@@ -186,35 +172,61 @@ export function Contact() {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="focus-ring inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="button focus-ring disabled:opacity-60"
           >
             {status === "loading" && (
               <span
                 aria-hidden="true"
-                className="h-3 w-3 animate-spin rounded-full border-2 border-background/30 border-t-background"
+                className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"
               />
             )}
-            {status === "loading" ? "Enviando..." : "Enviar mensagem"}
+            {status === "loading" ? "Enviando…" : "Enviar mensagem"}
           </button>
 
           <div role="status" aria-live="polite">
-            {status === "success" && (
-              <p className="text-sm text-accent">Mensagem enviada com sucesso!</p>
-            )}
+            {status === "success" && <p className="t-body">Mensagem enviada com sucesso!</p>}
             {status === "partial" && (
-              <p className="text-sm text-amber-400">
-                Recebi sua mensagem e ela já está registrada, mas a notificação
-                por e-mail falhou. Se for urgente, fale comigo por um dos canais
-                de contato desta seção.
+              <p className="t-body">
+                Recebi sua mensagem e ela já está registrada, mas a notificação por e-mail
+                falhou. Se for urgente, fale comigo por um dos canais desta seção.
               </p>
             )}
           </div>
           <div role="alert" aria-live="assertive">
-            {status === "error" && (
-              <p className="text-sm text-red-400">{errorMessage}</p>
-            )}
+            {status === "error" && <p className="t-body text-foreground">{errorMessage}</p>}
           </div>
         </form>
+
+        <div className="col-span-12 space-y-10">
+          <a
+            href={`mailto:${profile.email}`}
+            data-reveal
+            className="contact__email link focus-ring rounded no-underline"
+            translate="no"
+          >
+            {user}@
+            <wbr />
+            {domain}
+          </a>
+          <div className="t-small flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <p className="text-muted">{profile.location}, presencial ou remoto</p>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              {channels.map((channel) => (
+                <li key={channel.label}>
+                  <a
+                    href={channel.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link focus-ring rounded"
+                  >
+                    {channel.label}
+                    <span className="sr-only"> (abre em nova aba)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   );

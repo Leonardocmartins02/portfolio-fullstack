@@ -17,8 +17,8 @@ export const stats = [
   { value: "2+", label: "Anos de experiência" },
   { value: "150+", label: "Atendimentos via GLPI, AnyDesk e TeamViewer" },
   { value: "Full Stack", label: "Foco principal" },
-  { value: "UNIP", label: "Tecnólogo em ADS · Concluído" },
-  { value: "Ribeirão Preto", label: "SP · Presencial ou remoto" },
+  { value: "UNIP", label: "Tecnólogo em ADS, concluído" },
+  { value: "Ribeirão Preto", label: "SP, presencial ou remoto" },
 ];
 
 export const skills = [

@@ -1,35 +1,50 @@
+import type { CSSProperties } from "react";
 import { skills } from "@/lib/data";
 
+// Capítulo elevado entre a Trajetória e o Contato: o título grande à esquerda, com o
+// ✳ como marca, e os grupos numerados à direita, cada um com as ferramentas em
+// etiquetas.
 export function Skills() {
   return (
-    <section id="skills" className="mx-auto max-w-content px-6 py-16">
-      <span className="text-sm font-medium uppercase tracking-widest text-accent">
-        Skills &amp; Ferramentas
-      </span>
-      <h2 className="mb-6 mt-2 text-2xl font-semibold text-foreground sm:text-3xl">
-        Ferramentas e tecnologias
-      </h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {skills.map((group) => (
-          <div
-            key={group.group}
-            className="rounded-2xl border border-border bg-surface/60 p-5"
-          >
-            <h3 className="mb-4 text-xs font-medium uppercase tracking-widest text-muted">
-              {group.group}
-            </h3>
-            <ul className="flex flex-wrap gap-2">
-              {group.items.map((item) => (
-                <li
-                  key={item}
-                  className="rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-foreground/90 transition-colors hover:border-accent/60"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+    <section
+      id="skills"
+      aria-labelledby="skills-titulo"
+      data-chapter="raised"
+      className="chapter chapter-raised"
+    >
+      <div className="frame grid-12 gap-y-12 py-[var(--section-gap)]">
+        <h2 id="skills-titulo" data-reveal className="skills__title col-span-12 lg:col-span-6">
+          Do código
+          <br />
+          <em>à infraestrutura.</em>
+          {/* FE0E: força o ✳ como texto (na cor de destaque), nunca como emoji. */}
+          <span aria-hidden="true" className="skills__star">
+            {"✳︎"}
+          </span>
+        </h2>
+
+        <div className="col-span-12 lg:col-span-5 lg:col-start-8">
+          {skills.map((group, i) => (
+            <div
+              key={group.group}
+              data-reveal
+              style={{ "--i": i } as CSSProperties}
+              className="skills__group"
+            >
+              <h3 className="t-body flex items-baseline gap-4 font-semibold">
+                <span aria-hidden="true" className="t-small font-normal tabular-nums text-muted">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {group.group}
+              </h3>
+              <ul className="skills__tags mt-4">
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
