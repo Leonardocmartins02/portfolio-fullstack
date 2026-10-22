@@ -262,10 +262,11 @@ h3 {
   }
 
   /* ---------- Hero: o nome e o SimpleStock num notebook aberto ----------
-     Notebook e cards em CSS 3D (components/hero). A cena se mede em cqw da
-     figura, então o desenho é o mesmo em qualquer largura. A "luz" é o tom de
-     cada face: a base, voltada para cima, é a mais clara; a lateral direita, a
-     mais escura; a borda de alumínio da tampa recorta o notebook do fundo. */
+     Notebook em CSS 3D e cards do dashboard em volta (components/hero). A cena
+     se mede em cqw da figura, então o desenho é o mesmo em qualquer largura. A
+     "luz" é o tom de cada face: a base, voltada para cima, é a mais clara; a
+     lateral direita, a mais escura; a borda de alumínio da tampa recorta o
+     notebook do fundo. */
 
   .hero {
     overflow-x: clip;
