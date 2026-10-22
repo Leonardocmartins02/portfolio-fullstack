@@ -52,7 +52,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
-      <div className="mx-auto flex max-w-content items-center justify-between px-6 py-4">
+      <div data-header-bar className="mx-auto flex max-w-content items-center justify-between px-6 py-4">
         <Link
           href="#"
           className="focus-ring flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3"

@@ -29,7 +29,14 @@ Site de portfólio pessoal com um back-end real por trás: banco de dados, formu
 
 O SimpleStock tem uma apresentação dedicada em [`/projetos/simplestock`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/simplestock), com vídeo do fluxo real, captura de tela e decisões técnicas. O destaque editorial fica em `src/components/Projects.tsx`; os demais projetos continuam vindo do painel administrativo. O destaque permanece disponível mesmo quando a consulta ao banco falha.
 
-A landing page Perol (F5 Flotador e Lavix) segue o mesmo formato em [`/projetos/perol`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/perol): vídeo do fluxo no desktop e no celular, telas e decisões técnicas. O cartão dela fica no início da grade de projetos, também em `src/components/Projects.tsx`.
+A landing page Perol (F5 Flotador e Lavix) segue o mesmo formato em [`/projetos/perol`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/perol): vídeo do fluxo no desktop e no celular, telas e decisões técnicas. O painel dela vem logo depois do SimpleStock, também em `src/components/Projects.tsx`.
+
+## Rolagem nas seções Projetos e Trajetória
+
+As duas seções compartilham um laço de rolagem (`src/lib/scroll-orchestrator.ts`): um listener de scroll, um `requestAnimationFrame` por quadro, um `ResizeObserver` e uma consulta de movimento reduzido, sem biblioteca de animação.
+
+- **Projetos** (`src/components/projects/`): no desktop com altura suficiente, a seção fica fixa e a rolagem vertical desloca os painéis na horizontal; no celular, tablet ou janela baixa, vira um trilho com gesto, botões e contador; com movimento reduzido, sem JavaScript, na impressão ou em "Ver todos em lista", é uma lista vertical.
+- **Trajetória** (`src/components/Timeline.tsx`): o eixo se preenche conforme a leitura e destaca a experiência em foco, sem fixar nada. Os dados ficam em `experiences` e `education`, em `src/lib/data.ts`.
 
 ## Projetos em destaque
 

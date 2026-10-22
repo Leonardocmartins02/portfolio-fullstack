@@ -15,7 +15,9 @@ const config: Config = {
         border: "#26283A",
         foreground: "#F4F3F8",
         muted: "#9A98A8",
-        accent: "#7C6CF6",
+        // DEFAULT para formas (eixo, marcadores, contornos); text para texto roxo,
+        // com contraste maior sobre o fundo escuro.
+        accent: { DEFAULT: "#7C6CF6", text: "#B7A7FF" },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
