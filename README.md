@@ -36,7 +36,7 @@ A landing page Perol (F5 Flotador e Lavix) segue o mesmo formato em [`/projetos/
 A home inteira compartilha um laço de rolagem (`src/lib/scroll-orchestrator.ts`): um listener de scroll, um `requestAnimationFrame` por quadro, um `ResizeObserver` e uma consulta de movimento reduzido, sem biblioteca de animação.
 
 - **Capítulos**: campos escuros de profundidades diferentes separam as seções. No hero, um notebook desenhado em CSS 3D já abre no dashboard do SimpleStock, com cards do próprio sistema em volta (`src/components/hero/`). Na rolagem, os cards se recolhem para a tela; com mouse, a cena inclina de leve. Com movimento reduzido, tudo fica parado no estado inicial. O menu acompanha o capítulo atual; os fundos alternam entre o quase preto, o elevado (um tom acima) e o azul profundo do contato.
-- **Projetos** (`src/components/projects/`): painéis verticais sobem sobre o anterior no desktop e no celular. O título fica preso quando todos os painéis cabem na tela; painéis maiores permitem ler todo o conteúdo antes de parar. O foco por teclado revela o painel correspondente. Com movimento reduzido, sem JavaScript ou na impressão, a apresentação segue como lista vertical. O Agendamento de Salas aparece por último, identificado como primeiro projeto.
+- **Projetos** (`src/components/projects/`): painéis verticais sobem sobre o anterior no desktop e no celular. O título fica preso quando todos os painéis cabem na tela; painéis maiores permitem ler todo o conteúdo antes de parar. O foco por teclado revela o painel correspondente. Com movimento reduzido, sem JavaScript ou na impressão, a apresentação segue como lista vertical.
 - **Trajetória** (`src/components/Timeline.tsx`): título centralizado, sem retrato; a experiência em leitura recebe destaque no período, sem fixar a seção. Os dados ficam em `experiences` e `education`, em `src/lib/data.ts`.
 
 ## Projetos em destaque
@@ -44,7 +44,6 @@ A home inteira compartilha um laço de rolagem (`src/lib/scroll-orchestrator.ts`
 | Projeto | Descrição |
 |---|---|
 | [Sistema de estoque](https://github.com/Leonardocmartins02/Sistema-Estoque-main) | Monorepo de gestão de estoque (SimpleStock) — cadastro de produtos, controle de saldo e movimentações. |
-| [Agendamento de salas](https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas) | Reserva de salas para uma universidade — backend em Flask/SQLAlchemy. |
 | [Perol — landing page](https://github.com/Leonardocmartins02/pixel-perfect-replica) | Página de venda do F5 Flotador e do Lavix — React, TanStack Start e Tailwind CSS; artes de um parceiro. |
 
 ## Rodando localmente

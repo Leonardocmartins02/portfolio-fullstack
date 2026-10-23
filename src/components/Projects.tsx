@@ -4,18 +4,6 @@ import type { ProjectPanelData } from "@/components/projects/ProjectPanel";
 
 const stockRepository = "https://github.com/Leonardocmartins02/Sistema-Estoque-main";
 const perolRepository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
-const roomsRepository = "https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas";
-
-// Notas editoriais para projetos que vêm do banco, pelo link do repositório.
-const notes: Record<string, Pick<ProjectPanelData, "fact" | "highlight">> = {
-  [roomsRepository]: {
-    fact: "Primeiro projeto",
-    highlight: {
-      label: "Ponto de partida",
-      text: "meu primeiro projeto, mais simples que os outros; fica aqui para mostrar a evolução até os mais recentes.",
-    },
-  },
-};
 
 const normalize = (link: string | null) => link?.replace(/\.git$|\/$/g, "");
 
@@ -78,7 +66,6 @@ function fromDatabase(project: Project): ProjectPanelData {
   return {
     // Fato da linha do painel: o que o link de fato é, salvo nota editorial.
     fact: project.link ? (isRepository ? "Código aberto" : "Site no ar") : undefined,
-    ...notes[normalize(project.link) ?? ""],
     id: project.id,
     name: project.title,
     title: project.title,
@@ -105,12 +92,5 @@ export function Projects({ projects }: { projects: Project[] }) {
     return link !== stockRepository && link !== perolRepository;
   });
 
-  // O Agendamento, primeiro projeto e o mais simples, fecha a lista: a ordem
-  // termina mostrando de onde a evolução partiu.
-  const ordered = [...otherProjects].sort(
-    (a, b) =>
-      Number(normalize(a.link) === roomsRepository) - Number(normalize(b.link) === roomsRepository),
-  );
-
-  return <ProjectsShowcase projects={[...featured, ...ordered.map(fromDatabase)]} />;
+  return <ProjectsShowcase projects={[...featured, ...otherProjects.map(fromDatabase)]} />;
 }
