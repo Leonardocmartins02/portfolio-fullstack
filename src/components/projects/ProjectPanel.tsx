@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export type ProjectAction = {
-  label: "Ver demonstração" | "Ver código";
+  label: "Ver demonstração" | "Ver código" | "Ver site";
   href: string;
   external: boolean;
 };

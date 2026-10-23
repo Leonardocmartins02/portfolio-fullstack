@@ -4,18 +4,7 @@ import type { ProjectPanelData } from "@/components/projects/ProjectPanel";
 
 const stockRepository = "https://github.com/Leonardocmartins02/Sistema-Estoque-main";
 const perolRepository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
-const roomsRepository = "https://github.com/Leonardocmartins02/Projeto-Agendamento-de-Salas";
-
-// Notas editoriais para projetos que vêm do banco, pelo link do repositório.
-const notes: Record<string, Pick<ProjectPanelData, "fact" | "highlight">> = {
-  [roomsRepository]: {
-    fact: "Primeiro projeto",
-    highlight: {
-      label: "Ponto de partida",
-      text: "meu primeiro projeto, mais simples que os outros; fica aqui para mostrar a evolução até os mais recentes.",
-    },
-  },
-};
+const chadbbSite = "https://chadbb.online";
 
 const normalize = (link: string | null) => link?.replace(/\.git$|\/$/g, "");
 
@@ -70,6 +59,32 @@ const featured: ProjectPanelData[] = [
       { label: "Ver código", href: perolRepository, external: true },
     ],
   },
+  {
+    id: "chadbb",
+    name: "chadbb",
+    title: "chadbb: organizador de chá de bebê",
+    category: "Full stack",
+    fact: "Em produção",
+    description:
+      "Convites por link no WhatsApp, confirmação de presença e reserva de fraldas e mimos pelo celular, sem conta. Em uso para um chá real, com cerca de 50 convidados.",
+    highlight: {
+      label: "Destaque técnico",
+      text: "RLS restrita e escrita só por funções no Postgres, com saldo dos presentes numa fonte única e versão em cada registro; 678 testes E2E e auditoria de acessibilidade com axe.",
+    },
+    techs: ["React", "TypeScript", "Supabase", "PostgreSQL", "Cloudflare Pages", "Playwright"],
+    image: null,
+    video: {
+      src: "/projects/chadbb-demo.webm",
+      poster: "/projects/chadbb-poster.png",
+      width: 1440,
+      height: 1080,
+      label: "Demonstração do chadbb: painel do organizador com presença, convidados e presentes e, no celular, a confirmação e a reserva de presentes pelo convidado",
+    },
+    actions: [
+      { label: "Ver demonstração", href: "/projetos/chadbb", external: false },
+      { label: "Ver site", href: `${chadbbSite}/`, external: true },
+    ],
+  },
 ];
 
 // Os demais projetos vêm do painel administrativo, com o texto como foi cadastrado.
@@ -78,7 +93,6 @@ function fromDatabase(project: Project): ProjectPanelData {
   return {
     // Fato da linha do painel: o que o link de fato é, salvo nota editorial.
     fact: project.link ? (isRepository ? "Código aberto" : "Site no ar") : undefined,
-    ...notes[normalize(project.link) ?? ""],
     id: project.id,
     name: project.title,
     title: project.title,
@@ -102,15 +116,8 @@ export function Projects({ projects }: { projects: Project[] }) {
   // Projetos com apresentação própria no código não se repetem na lista que vem do banco.
   const otherProjects = projects.filter((project) => {
     const link = normalize(project.link);
-    return link !== stockRepository && link !== perolRepository;
+    return link !== stockRepository && link !== perolRepository && link !== chadbbSite;
   });
 
-  // O Agendamento, primeiro projeto e o mais simples, fecha a lista: a ordem
-  // termina mostrando de onde a evolução partiu.
-  const ordered = [...otherProjects].sort(
-    (a, b) =>
-      Number(normalize(a.link) === roomsRepository) - Number(normalize(b.link) === roomsRepository),
-  );
-
-  return <ProjectsShowcase projects={[...featured, ...ordered.map(fromDatabase)]} />;
+  return <ProjectsShowcase projects={[...featured, ...otherProjects.map(fromDatabase)]} />;
 }
