@@ -23,6 +23,8 @@ export type ProjectPanelData = {
   image: { src: string; alt: string } | null;
   /** Demonstração em vídeo: toma o lugar da imagem e mantém a proporção original. */
   video?: { src: string; poster: string; width: number; height: number; label: string };
+  /** Endereço mostrado na barra da janela que emoldura a captura ("chadbb.online"). */
+  url?: string;
   actions: ProjectAction[];
 };
 
@@ -115,40 +117,51 @@ export function ProjectPanel({
           ) : null}
         </div>
 
-        <figure
-          className="project__picture"
-          data-reveal="picture"
-          style={
-            project.video
-              ? { ...second, aspectRatio: `${project.video.width} / ${project.video.height}` }
-              : second
-          }
-        >
-          {/* Sem som e em loop; o ProjectsShowcase toca só o vídeo do painel da vez. */}
-          {project.video ? (
-            <video
-              muted
-              loop
-              playsInline
-              controls
-              preload={loading === "eager" ? "metadata" : "none"}
-              width={project.video.width}
-              height={project.video.height}
-              poster={project.video.poster}
-              aria-label={project.video.label}
-            >
-              <source src={project.video.src} type="video/webm" />
-            </video>
-          ) : project.image ? (
-            <Image
-              src={project.image.src}
-              alt={project.image.alt}
-              width={1600}
-              height={1000}
-              loading={loading}
-              sizes="(min-width: 1024px) 58vw, 100vw"
-            />
-          ) : null}
+        {/* A captura fica numa janela de navegador: barra com o endereço e a
+            proporção original do vídeo na área de baixo. */}
+        <figure className="project__picture" data-reveal="picture" style={second}>
+          <div className="project__window-bar" aria-hidden="true">
+            <span className="project__window-dots">
+              <span />
+              <span />
+              <span />
+            </span>
+            {project.url ? <span className="project__window-url">{project.url}</span> : null}
+          </div>
+          <div
+            className="project__window-view"
+            style={
+              project.video
+                ? { aspectRatio: `${project.video.width} / ${project.video.height}` }
+                : undefined
+            }
+          >
+            {/* Sem som e em loop; o ProjectsShowcase toca só o vídeo do painel da vez. */}
+            {project.video ? (
+              <video
+                muted
+                loop
+                playsInline
+                controls
+                preload={loading === "eager" ? "metadata" : "none"}
+                width={project.video.width}
+                height={project.video.height}
+                poster={project.video.poster}
+                aria-label={project.video.label}
+              >
+                <source src={project.video.src} type="video/webm" />
+              </video>
+            ) : project.image ? (
+              <Image
+                src={project.image.src}
+                alt={project.image.alt}
+                width={1600}
+                height={1000}
+                loading={loading}
+                sizes="(min-width: 1024px) 58vw, 100vw"
+              />
+            ) : null}
+          </div>
         </figure>
       </article>
     </li>

@@ -812,12 +812,61 @@ h3 {
     grid-column: 1 / -1;
   }
 
+  /* A captura numa janela de navegador, como no vídeo de apresentação: cantos
+     arredondados, barra com os três pontos e o endereço, contorno fino e um
+     brilho azul baixo atrás. */
   .project__picture {
     grid-column: 1 / -1;
     margin-inline: 0;
-    aspect-ratio: 16 / 10;
+    border-radius: clamp(14px, 1.4vw, 22px);
     overflow: clip;
     background-color: rgb(var(--surface));
+    box-shadow:
+      0 0 0 1px rgb(var(--line)),
+      0 28px 80px -24px rgb(var(--accent) / 0.35); /* taste-skill-ignore: brilho da janela, pedido para seguir o vídeo de apresentação. */
+  }
+
+  .project__window-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: clamp(34px, 2.6vw, 44px);
+    padding-inline: clamp(12px, 1.2vw, 18px);
+    border-bottom: 1px solid rgb(var(--line) / 0.6);
+    background-color: rgb(var(--ink) / 0.04);
+  }
+
+  .project__window-dots {
+    display: flex;
+    gap: 7px;
+  }
+
+  .project__window-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ff6b6b;
+  }
+
+  .project__window-dots span:nth-child(2) { background-color: #f7c04a; }
+  .project__window-dots span:nth-child(3) { background-color: #4cd07d; }
+
+  .project__window-url {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 4px 14px;
+    background-color: rgb(var(--ground));
+    color: rgb(var(--muted));
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+  }
+
+  .project__window-view {
+    aspect-ratio: 16 / 10;
   }
 
   .project__picture img,
@@ -848,11 +897,15 @@ h3 {
       grid-column: 1 / span 4;
     }
 
-    /* A captura ocupa a grade até a margem direita, cantos retos. */
+    /* A janela ocupa a grade até a margem direita; a área do vídeo desconta a
+       barra para a janela inteira caber na tela. */
     .project__picture {
       grid-column: 6 / -1;
       margin-inline: 0;
-      max-height: max(320px, calc(100svh - var(--header-offset, 4rem) - var(--band) - 7rem));
+    }
+
+    .project__window-view {
+      max-height: max(280px, calc(100svh - var(--header-offset, 4rem) - var(--band) - 7rem - 44px));
     }
   }
 
