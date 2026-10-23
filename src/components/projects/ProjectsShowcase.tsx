@@ -166,11 +166,14 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
     };
   }, [reducedMotion, total]);
 
-  // Ao focar um link, alinha o painel à posição natural para manter o texto
-  // inteiro visível, sem mover o foco.
+  // Ao focar um link pelo teclado, alinha o painel à posição natural para manter
+  // o texto inteiro visível, sem mover o foco.
   function revealFocused(event: FocusEvent<HTMLOListElement>) {
     if (reducedMotion) return;
     const target = event.target as HTMLElement;
+    // Clique e toque também focam o link, mas no meio do gesto: rolar aqui tira
+    // o link de baixo do ponteiro e o clique cai no texto do painel.
+    if (!target.matches(":focus-visible")) return;
     const slot = target.closest<HTMLElement>("[data-panel-index]");
     if (!slot) return;
     const i = Number(slot.dataset.panelIndex);
