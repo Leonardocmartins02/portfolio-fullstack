@@ -4,6 +4,7 @@ import type { ProjectPanelData } from "@/components/projects/ProjectPanel";
 
 const stockRepository = "https://github.com/Leonardocmartins02/Sistema-Estoque-main";
 const perolRepository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
+const chadbbSite = "https://chadbb.online";
 
 const normalize = (link: string | null) => link?.replace(/\.git$|\/$/g, "");
 
@@ -58,6 +59,32 @@ const featured: ProjectPanelData[] = [
       { label: "Ver código", href: perolRepository, external: true },
     ],
   },
+  {
+    id: "chadbb",
+    name: "chadbb",
+    title: "chadbb: organizador de chá de bebê",
+    category: "Full stack",
+    fact: "Em produção",
+    description:
+      "Convites por link no WhatsApp, confirmação de presença e reserva de fraldas e mimos pelo celular, sem conta. Em uso para um chá real, com cerca de 50 convidados.",
+    highlight: {
+      label: "Destaque técnico",
+      text: "RLS restrita e escrita só por funções no Postgres, com saldo dos presentes numa fonte única e versão em cada registro; 678 testes E2E e auditoria de acessibilidade com axe.",
+    },
+    techs: ["React", "TypeScript", "Supabase", "PostgreSQL", "Cloudflare Pages", "Playwright"],
+    image: null,
+    video: {
+      src: "/projects/chadbb-demo.webm",
+      poster: "/projects/chadbb-poster.png",
+      width: 1440,
+      height: 1080,
+      label: "Demonstração do chadbb: painel do organizador com presença, convidados e presentes e, no celular, a confirmação e a reserva de presentes pelo convidado",
+    },
+    actions: [
+      { label: "Ver demonstração", href: "/projetos/chadbb", external: false },
+      { label: "Ver site", href: `${chadbbSite}/`, external: true },
+    ],
+  },
 ];
 
 // Os demais projetos vêm do painel administrativo, com o texto como foi cadastrado.
@@ -89,7 +116,7 @@ export function Projects({ projects }: { projects: Project[] }) {
   // Projetos com apresentação própria no código não se repetem na lista que vem do banco.
   const otherProjects = projects.filter((project) => {
     const link = normalize(project.link);
-    return link !== stockRepository && link !== perolRepository;
+    return link !== stockRepository && link !== perolRepository && link !== chadbbSite;
   });
 
   return <ProjectsShowcase projects={[...featured, ...otherProjects.map(fromDatabase)]} />;

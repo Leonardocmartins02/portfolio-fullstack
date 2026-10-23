@@ -20,7 +20,7 @@ Site de portfólio pessoal com um back-end real por trás: banco de dados, formu
 ## Funcionalidades
 
 - **Site público** com seções de apresentação, skills, trajetória profissional, projetos e contato.
-- **Projetos complementares**: cadastrados via banco de dados e gerenciados pelo painel, com apresentações editoriais dedicadas ao SimpleStock e à landing page Perol.
+- **Projetos complementares**: cadastrados via banco de dados e gerenciados pelo painel, com apresentações editoriais dedicadas ao SimpleStock, à landing page Perol e ao chadbb.
 - **Painel administrativo protegido** (`/admin/dashboard`): CRUD completo de projetos e visualização das mensagens recebidas pelo formulário de contato.
 - **Formulário de contato resiliente**: toda mensagem é salva no banco mesmo se o envio de e-mail falhar, e o usuário recebe um status honesto sobre o que realmente aconteceu.
 - **Autenticação segura**: sessão JWT, senha com hash bcrypt, rotas de mutação protegidas por `getServerSession`.
@@ -30,6 +30,8 @@ Site de portfólio pessoal com um back-end real por trás: banco de dados, formu
 O SimpleStock tem uma apresentação dedicada em [`/projetos/simplestock`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/simplestock), com vídeo do fluxo real, captura de tela e decisões técnicas. O destaque editorial fica em `src/components/Projects.tsx`; os demais projetos continuam vindo do painel administrativo. O destaque permanece disponível mesmo quando a consulta ao banco falha.
 
 A landing page Perol (F5 Flotador e Lavix) segue o mesmo formato em [`/projetos/perol`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/perol): vídeo do fluxo no desktop e no celular, telas e decisões técnicas. O painel dela vem logo depois do SimpleStock, também em `src/components/Projects.tsx`.
+
+O chadbb, organizador de chá de bebê em produção, tem o mesmo formato em [`/projetos/chadbb`](https://portfolio-fullstack-delta-seven.vercel.app/projetos/chadbb). O vídeo e as telas usam dados fictícios e o backend simulado dos testes do próprio chadbb, para não expor os convidados do evento real.
 
 ## Rolagem nas seções Projetos e Trajetória
 
@@ -45,6 +47,7 @@ A home inteira compartilha um laço de rolagem (`src/lib/scroll-orchestrator.ts`
 |---|---|
 | [Sistema de estoque](https://github.com/Leonardocmartins02/Sistema-Estoque-main) | Monorepo de gestão de estoque (SimpleStock) — cadastro de produtos, controle de saldo e movimentações. |
 | [Perol — landing page](https://github.com/Leonardocmartins02/pixel-perfect-replica) | Página de venda do F5 Flotador e do Lavix — React, TanStack Start e Tailwind CSS; artes de um parceiro. |
+| [chadbb](https://chadbb.online/) | Organizador de chá de bebê: convites por link, presença e presentes pelo celular — React, Supabase e Cloudflare Pages. |
 
 ## Rodando localmente
 
@@ -101,7 +104,7 @@ EMAIL_TO="seuemail@exemplo.com"
 
 - **Dados pessoais** (nome, bio, links, skills, trajetória): `src/lib/data.ts`.
 - **Tema/cores**: `tailwind.config.ts`.
-- **Projetos complementares**: use o painel admin (`/admin/dashboard`). O destaque e a demonstração do SimpleStock ficam em `src/components/Projects.tsx` e `src/app/projetos/simplestock/page.tsx`; os da landing page Perol, em `src/components/Projects.tsx` e `src/app/projetos/perol/page.tsx`.
+- **Projetos complementares**: use o painel admin (`/admin/dashboard`). O destaque e a demonstração do SimpleStock ficam em `src/components/Projects.tsx` e `src/app/projetos/simplestock/page.tsx`; os da landing page Perol e do chadbb, em `src/components/Projects.tsx` e em `src/app/projetos/perol/page.tsx` e `src/app/projetos/chadbb/page.tsx`.
 
 ## Estrutura do projeto
 
