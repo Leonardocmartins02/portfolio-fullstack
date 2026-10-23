@@ -25,6 +25,7 @@ const featured: ProjectPanelData[] = [
     },
     techs: ["React", "Express", "TypeScript", "Prisma", "PostgreSQL", "Vitest"],
     image: null,
+    url: "simplestock · nova interface",
     video: {
       src: "/projects/simplestock-v2-demo.webm",
       poster: "/projects/simplestock-v2-poster.png",
@@ -47,6 +48,7 @@ const featured: ProjectPanelData[] = [
       "Página de venda do F5 Flotador e do Lavix para campanhas de anúncio: troca de produto, galeria por volume, kits com preço por litro e guia por ambiente. Fiz o código; as artes são de um parceiro.",
     techs: ["React", "TanStack Start", "Tailwind CSS"],
     image: null,
+    url: "perol · F5 Flotador",
     video: {
       src: "/projects/perol-demo.webm",
       poster: "/projects/perol-poster.png",
@@ -73,6 +75,7 @@ const featured: ProjectPanelData[] = [
     },
     techs: ["React", "TypeScript", "Supabase", "PostgreSQL", "Cloudflare Pages", "Playwright"],
     image: null,
+    url: "chadbb.online",
     video: {
       src: "/projects/chadbb-demo.webm",
       poster: "/projects/chadbb-poster.png",
@@ -100,6 +103,8 @@ function fromDatabase(project: Project): ProjectPanelData {
     description: project.description,
     // O título já está no painel; a captura não acrescenta texto a ele.
     image: project.imageUrl ? { src: project.imageUrl, alt: "" } : null,
+    // Barra da janela: o endereço do link, sem protocolo nem barra final.
+    url: project.link?.replace(/^https?:\/\/(www\.)?|\/$/g, ""),
     actions: project.link
       ? [
           {
