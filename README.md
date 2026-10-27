@@ -46,7 +46,7 @@ A home inteira compartilha um laço de rolagem (`src/lib/scroll-orchestrator.ts`
 | Projeto | Descrição |
 |---|---|
 | [Sistema de estoque](https://github.com/Leonardocmartins02/Sistema-Estoque-main) | Monorepo de gestão de estoque (SimpleStock) — cadastro de produtos, controle de saldo e movimentações. |
-| [Perol — landing page](https://github.com/Leonardocmartins02/pixel-perfect-replica) | Página de venda do F5 Flotador e do Lavix — React, TanStack Start e Tailwind CSS; artes de um parceiro. |
+| [Perol — landing page](https://github.com/Leonardocmartins02/pixel-perfect-replica) | Página de venda do F5 Flotador e do Lavix — React, TanStack Start e Tailwind CSS; código e artes feitos por mim. |
 | [chadbb](https://chadbb.online/) | Organizador de chá de bebê: convites por link, presença e presentes pelo celular — React, Supabase e Cloudflare Pages. |
 
 ## Rodando localmente
