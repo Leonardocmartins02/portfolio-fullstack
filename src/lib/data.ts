@@ -45,7 +45,7 @@ export const skills = [
 export const experiences = [
   {
     id: "elo-infraestrutura",
-    start: "2026-09",
+    start: "2026-08",
     end: null,
     role: "Analista de Suporte de TI",
     company: "Elo Infraestrutura",
