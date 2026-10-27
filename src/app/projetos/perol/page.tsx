@@ -34,8 +34,8 @@ export default function PerolPage() {
         Página de venda de dois produtos da linha profissional Perol, feita para receber o
         tráfego dos anúncios. Uma página só troca entre o F5 Flotador e o Lavix, com galeria por
         volume, kits com preço por litro, respostas às dúvidas de compra, guia de uso por
-        ambiente e ficha técnica. Fiquei com o código; as artes foram criadas por um parceiro,
-        que também vai cuidar dos anúncios.
+        ambiente e ficha técnica. Fiz tudo: o código e as artes. O marketing e os
+        anúncios ficam com um parceiro.
       </p>
       <div className="mt-6 flex flex-wrap gap-5 text-sm font-medium text-accent">
         <a className="focus-ring rounded hover:underline" href={repository} target="_blank" rel="noopener noreferrer">Ver código ↗</a>
