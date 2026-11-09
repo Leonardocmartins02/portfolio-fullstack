@@ -43,12 +43,15 @@ export function ProjectPanel({
   total,
   tone,
   loading,
+  cover,
 }: {
   project: ProjectPanelData;
   index: number;
   total: number;
   tone: "raised" | "dark";
   loading: "lazy" | "eager";
+  /** View timeline do marco do painel seguinte, que cobre este (ausente no último). */
+  cover?: string;
 }) {
   const headingId = `projeto-${project.id}`;
   const second = { "--i": 1 } as CSSProperties;
@@ -58,6 +61,8 @@ export function ProjectPanel({
       className={`project-slot chapter chapter-${tone}`}
       data-chapter={tone}
       data-panel-index={index}
+      data-cover={cover ? "" : undefined}
+      style={cover ? ({ "--cover": cover } as CSSProperties) : undefined}
     >
       <article aria-labelledby={headingId} className="project">
         <div className="project__row" data-reveal>
@@ -164,6 +169,10 @@ export function ProjectPanel({
           </div>
         </figure>
       </article>
+      {/* Escurece o painel enquanto o seguinte sobe. Elemento próprio (e não
+          ::after com variável) para a opacidade ser só composição, sem
+          recalcular o estilo do painel inteiro a cada quadro. */}
+      <span className="project-slot__shade" aria-hidden="true" />
     </li>
   );
 }

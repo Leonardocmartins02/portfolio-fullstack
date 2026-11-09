@@ -197,11 +197,18 @@ h3 {
       background-color var(--t-hover) ease,
       color var(--t-hover) ease,
       transform var(--t-press) var(--ease-out);
+    /* Segurar o botão no celular não seleciona o rótulo. */
+    user-select: none;
+    -webkit-user-select: none;
   }
 
-  .button:hover {
-    background-color: rgb(var(--ink));
-    color: rgb(var(--ground));
+  /* Hover só com mouse: no toque o navegador simula :hover no tap e o estado
+     fica preso depois de soltar o dedo. O toque tem o :active. */
+  @media (hover: hover) and (pointer: fine) {
+    .button:hover {
+      background-color: rgb(var(--ink));
+      color: rgb(var(--ground));
+    }
   }
 
   .button:active {
@@ -223,9 +230,11 @@ h3 {
       color var(--t-hover) ease;
   }
 
-  .link:hover {
-    color: rgb(var(--accent));
-    text-decoration-color: currentColor;
+  @media (hover: hover) and (pointer: fine) {
+    .link:hover {
+      color: rgb(var(--accent));
+      text-decoration-color: currentColor;
+    }
   }
 
   /* ---------- Cabeçalho ----------
@@ -909,28 +918,40 @@ h3 {
     }
   }
 
+  /* Marco de altura zero depois de cada painel (régua da subida do seguinte e
+     ponto de parada no celular) e a camada que escurece o painel coberto. Sem
+     JS ou com movimento reduzido, nenhum dos dois aparece. */
+  .projects__mark {
+    height: 0;
+  }
+
+  .project-slot__shade {
+    display: none;
+  }
+
   @media screen and (prefers-reduced-motion: no-preference) {
     /* Com JS: cada painel ocupa a tela e sobe por cima do anterior (painel mais
        alto que a tela para com a base embaixo, via --stick). */
     .js .project-slot {
       position: sticky;
       top: var(--stick, 0px);
-      /* Pilha de cartas: o painel coberto recua (escala no ProjectsShowcase),
-         arredonda os cantos e escurece enquanto o seguinte sobe (--depth 0 a 1).
-         O contorno só existe durante a troca: marca a borda da carta escura
-         sobre o fundo escuro e some em repouso. */
-      transform-origin: 50% 0;
-      border-radius: calc(var(--depth, 0) * 20px);
-      box-shadow: 0 0 0 1px rgb(var(--ink) / calc(var(--depth, 0) * 0.16)); /* taste-skill-ignore: contorno só em movimento, não sombra em repouso. */
+      /* Pilha de cartas: o painel coberto recua para o centro da parte visível
+         (abaixo do cabeçalho), não para o topo. No celular o topo do painel
+         fica fora da tela, e recuar para ele fazia o conteúdo escorregar para
+         cima em vez de afundar no lugar. */
+      transform-origin: 50% calc(100% - (100svh - var(--header-offset, 4rem)) / 2);
     }
 
-    .js .project-slot::after {
-      content: "";
+    /* Escurece e contorna a carta coberta. Só a opacidade muda (0 a 1), então a
+       troca fica no compositor: nada de raio ou sombra animados repintando o
+       painel inteiro a cada quadro. */
+    .js .project-slot__shade {
+      display: block;
       position: absolute;
       inset: 0;
-      border-radius: inherit;
-      background-color: rgb(0 0 0);
-      opacity: calc(var(--depth, 0) * 0.5);
+      background-color: rgb(0 0 0 / 0.5);
+      box-shadow: 0 0 0 1px rgb(var(--ink) / 0.16); /* taste-skill-ignore: contorno só em movimento, não sombra em repouso. */
+      opacity: 0;
       pointer-events: none;
     }
 
@@ -961,6 +982,97 @@ h3 {
 
     .js .projects[data-pinned] .project {
       padding-top: calc(var(--header-offset, 4rem) + var(--band) + 1rem);
+    }
+  }
+
+  /* Recuo guiado pela rolagem, no compositor: cada painel com data-cover usa a
+     view timeline do marco que vem depois dele (--cover). "cover" de um marco
+     de altura zero vai de 0 (marco na base da tela) a 1 (marco no topo), a mesma
+     régua do laço em JS, que fica só para navegadores sem animation-timeline.
+     Propriedades longas (sem o atalho "animation"), porque o atalho zera
+     animation-timeline. */
+  @supports (animation-timeline: view()) {
+    @media screen and (prefers-reduced-motion: no-preference) {
+      .js .projects__list {
+        timeline-scope: var(--marks);
+      }
+
+      .js .projects__mark {
+        view-timeline-name: var(--mark);
+        view-timeline-axis: block;
+        view-timeline-inset: 0;
+      }
+
+      .js .project-slot[data-cover],
+      .js .project-slot[data-cover] > .project-slot__shade,
+      .js .project-slot[data-cover] :is(.project__row, .project__text) > * {
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: var(--cover);
+        animation-range: cover 0% cover 100%;
+      }
+
+      .js .project-slot[data-cover] {
+        animation-name: project-recede;
+      }
+
+      .js .project-slot[data-cover] > .project-slot__shade {
+        animation-name: project-shade;
+      }
+
+      /* O texto some no primeiro trecho, antes que a folha nova chegue até ele. */
+      .js .project-slot[data-cover] :is(.project__row, .project__text) > * {
+        animation-name: project-copy-out;
+        animation-range: cover 0% cover 35%;
+      }
+    }
+  }
+
+  .projects__stops {
+    display: none;
+  }
+
+  /* Celular: cada painel assenta na tela quando a rolagem para perto dele, em
+     vez de ficar meio coberto pelo seguinte. Os pontos de parada são medidos e
+     posicionados no ProjectsShowcase. "proximity", nunca "mandatory": fora dos
+     Projetos a página rola livre. Por capacidade (toque), não por largura. A
+     entrada (título "Projetos") e a saída (Trajetória) também são paradas, para
+     a pilha não puxar quem parou para ler o que vem antes ou depois dela. */
+  @media screen and (prefers-reduced-motion: no-preference) and (pointer: coarse) {
+    html.js {
+      scroll-snap-type: y proximity;
+    }
+
+    .js .projects__stops {
+      display: block;
+    }
+
+    /* Largura total: o Chrome ignora área de parada sem largura. */
+    .js .projects__stops > span {
+      position: absolute;
+      inset-inline: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .js .projects__stops > [data-align="end"] {
+      scroll-snap-align: end;
+    }
+
+    .js .projects__stops > [data-align="start"] {
+      scroll-snap-align: start;
+    }
+
+    /* Só blocos menores que a tela: uma área de parada mais alta que ela (a
+       seção inteira, por exemplo) torna válida qualquer posição dentro dela e
+       anula as outras paradas. O título preso (data-pinned) é sticky e fica de fora. */
+    .js .projects:not([data-pinned]) .projects__heading {
+      scroll-snap-align: start;
+    }
+
+    .js .timeline__title {
+      scroll-snap-align: start;
+      scroll-margin-top: var(--section-gap);
     }
   }
 
@@ -1090,8 +1202,10 @@ h3 {
     transition: border-color var(--t-hover) ease;
   }
 
-  .field:hover {
-    border-bottom-color: rgb(var(--muted));
+  @media (hover: hover) and (pointer: fine) {
+    .field:hover {
+      border-bottom-color: rgb(var(--muted));
+    }
   }
 
   .field:focus-visible {
@@ -1138,6 +1252,27 @@ h3 {
       transform: translateX(-24px);
     }
 
+  }
+}
+
+/* Recuo dos painéis de Projetos (ver "Recuo guiado pela rolagem"). Só transform
+   e opacity; os valores iniciais vêm do próprio elemento. */
+@keyframes project-recede {
+  to {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes project-shade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes project-copy-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -24px, 0);
   }
 }
 
