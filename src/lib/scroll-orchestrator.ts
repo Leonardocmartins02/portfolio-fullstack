@@ -40,6 +40,7 @@ let dirty = true;
 let headerOffset = 0;
 let maxScroll = 0;
 let smallViewportHeight = 0;
+let measuredWidth = 0;
 let viewportProbe: HTMLElement | null = null;
 let resizeObserver: ResizeObserver | null = null;
 
@@ -79,6 +80,7 @@ function run(): boolean {
     dirty = false;
     measureHeader();
     smallViewportHeight = viewportProbe?.offsetHeight ?? 0;
+    measuredWidth = window.innerWidth;
     maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const frame = currentFrame();
     for (const controller of controllers) {
@@ -125,6 +127,16 @@ export function getHeaderOffset() {
   return headerOffset;
 }
 
+// No celular a barra de endereço aparece e some durante a rolagem e cada vez
+// dispara resize, mudando só a altura "grande" (100vh). As medidas usam 100svh,
+// que não muda: aí basta redesenhar o quadro, sem remedir o layout no meio do
+// gesto. Girar a tela ou redimensionar a janela muda largura ou svh e remede.
+function onResize() {
+  const small = viewportProbe?.offsetHeight ?? 0;
+  if (window.innerWidth === measuredWidth && small === smallViewportHeight) requestFrame();
+  else invalidateScroll();
+}
+
 function onLoadCapture(event: Event) {
   if (event.target instanceof HTMLImageElement) invalidateScroll();
 }
@@ -136,7 +148,7 @@ function attach() {
     "position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none";
   document.body.appendChild(viewportProbe);
   document.addEventListener("scroll", requestFrame, { capture: true, passive: true });
-  window.addEventListener("resize", invalidateScroll);
+  window.addEventListener("resize", onResize);
   document.addEventListener("load", onLoadCapture, true);
   resizeObserver = new ResizeObserver(invalidateScroll);
   resizeObserver.observe(document.body);
@@ -148,7 +160,7 @@ function attach() {
 
 function detach() {
   document.removeEventListener("scroll", requestFrame, { capture: true });
-  window.removeEventListener("resize", invalidateScroll);
+  window.removeEventListener("resize", onResize);
   document.removeEventListener("load", onLoadCapture, true);
   resizeObserver?.disconnect();
   resizeObserver = null;

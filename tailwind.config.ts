@@ -2,6 +2,8 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: "class",
+  // hover: só onde existe hover de verdade (mouse); no toque o estado ficava preso.
+  future: { hoverOnlyWhenSupported: true },
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
