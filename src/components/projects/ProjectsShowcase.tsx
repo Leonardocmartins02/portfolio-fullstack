@@ -6,12 +6,19 @@ import {
   flushScroll,
   getHeaderOffset,
   registerScrollController,
+  useMediaQuery,
   useReducedMotion,
 } from "@/lib/scroll-orchestrator";
 
-// Assinatura da página (taste-skill, "pinned story"): o título "Projetos" fica
-// preso no topo enquanto cada projeto, um painel de tela cheia, sobe por cima do
-// anterior. Sem JS ou com movimento reduzido, os painéis só seguem um abaixo do outro.
+// Desktop (1024px ou mais), assinatura da página (taste-skill, "pinned story"): o
+// título "Projetos" fica preso no topo enquanto cada projeto, um painel de tela
+// cheia, sobe por cima do anterior. Sem JS ou com movimento reduzido, os painéis
+// só seguem um abaixo do outro.
+//
+// Celular e tablet: um carrossel de cards com scroll-snap horizontal, todo no CSS.
+// Aqui só se atualiza o contador e o vídeo do card da vez. A pilha não serve
+// nessa largura: painéis da altura da tela subindo um sobre o outro nunca
+// enquadram direito no celular.
 //
 // Antes de cada painel há um marco de altura zero (li.projects__mark) na posição
 // natural da borda de cima dele. O marco não é sticky, então é uma régua estável
@@ -20,13 +27,6 @@ import {
 // navegador tem animações por rolagem (animation-timeline), o recuo roda no CSS,
 // no compositor, colado à rolagem. Nos outros, este laço escreve os mesmos
 // valores a cada quadro.
-//
-// No celular, cada painel tem um ponto de parada (scroll-snap) para não ficar
-// meio coberto pelo seguinte: o que cabe na tela assenta inteiro, com a base na
-// base da tela; o mais alto, com o nome logo abaixo do cabeçalho. Os pontos são
-// absolutos na seção (div.projects__stops), na posição natural medida aqui: o
-// ponto precisa estar dentro da área visível na parada, senão o navegador trata
-// a área como maior que a tela e para em qualquer borda.
 
 // Pilha de cartas: quanto o painel coberto recua (5%) enquanto o seguinte sobe.
 const DEPTH_SCALE = 0.05;
@@ -34,10 +34,13 @@ const DEPTH_SCALE = 0.05;
 const COPY_FADE_END = 0.35;
 
 const markName = (i: number) => `--projeto-marco-${i}`;
+// Mesmo corte do CSS (carrossel abaixo de 1024px).
+const CAROUSEL_QUERY = "(max-width: 1023px)";
 
 export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] }) {
   const total = projects.length;
   const reducedMotion = useReducedMotion();
+  const carousel = useMediaQuery(CAROUSEL_QUERY);
   const sectionRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLOListElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
@@ -47,13 +50,12 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
   useEffect(() => {
     const section = sectionRef.current;
     const list = listRef.current;
-    if (!section || !list || reducedMotion) return;
+    if (!section || !list || reducedMotion || carousel) return;
     // Com animation-timeline o CSS cuida do recuo; o laço só mede e troca estados.
     const cssDriven = CSS.supports("animation-timeline: view()");
     const slots = Array.from(list.querySelectorAll<HTMLElement>(":scope > .project-slot"));
     const marks = Array.from(list.querySelectorAll<HTMLElement>(":scope > .projects__mark"));
     const shades = slots.map((slot) => slot.querySelector<HTMLElement>(".project-slot__shade"));
-    const stops = Array.from(section.querySelectorAll<HTMLElement>(".projects__stops > span"));
     // Texto de cada painel (filhos da linha do nome e da coluna de texto): sai
     // quando o painel seguinte começa a cobri-lo, para nada ficar escrito por baixo.
     const copy = slots.map((slot) =>
@@ -107,17 +109,6 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
           // Painel mais alto que a tela só para quando a base dele chega embaixo,
           // depois de lido por inteiro.
           slot.style.setProperty("--stick", `${Math.min(0, frame.smallViewportHeight - heights[i])}px`);
-          // Ponto de parada no celular. Cabe na tela se, com a base na base da
-          // tela, o que sobra acima dela é só respiro (padding de cima menos o
-          // cabeçalho): aí o ponto é a base natural, alinhada ao fim da tela.
-          // Senão, é o início do conteúdo, alinhado logo abaixo do cabeçalho.
-          const stop = stops[i];
-          if (!stop) return;
-          const padding = parseFloat(getComputedStyle(slot.firstElementChild as Element).paddingTop);
-          const fitsScreen = heights[i] - frame.smallViewportHeight <= padding - frame.headerOffset;
-          const y = naturalTops.current[i] - sectionTop + (fitsScreen ? heights[i] : padding);
-          stop.style.top = `${y}px`;
-          stop.dataset.align = fitsScreen ? "end" : "start";
         });
       },
       read(frame) {
@@ -191,22 +182,68 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
         slot.style.removeProperty("transform");
       }
       for (const shade of shades) shade?.style.removeProperty("opacity");
-      for (const stop of stops) {
-        stop.style.removeProperty("top");
-        delete stop.dataset.align;
-      }
       for (const video of videos) video?.pause();
       for (const item of copy.flat()) {
         item.style.removeProperty("opacity");
         item.style.removeProperty("transform");
       }
     };
-  }, [reducedMotion, total]);
+  }, [reducedMotion, carousel, total]);
+
+  // Carrossel: o card da vez sai da posição da trilha (scrollLeft / passo entre
+  // cards). O laço de rolagem já escuta a rolagem horizontal (fase de captura).
+  useEffect(() => {
+    const section = sectionRef.current;
+    const list = listRef.current;
+    if (!section || !list || !carousel) return;
+    const slots = Array.from(list.querySelectorAll<HTMLElement>(":scope > .project-slot"));
+    const videos = slots.map((slot) => slot.querySelector("video"));
+    let step = 1;
+    let current = 0;
+    let active = -1;
+    let playing = -1;
+    let sectionTop = 0;
+    let preloaded = false;
+
+    const unregister = registerScrollController({
+      element: section,
+      measure(frame) {
+        step = slots.length > 1 ? slots[1].offsetLeft - slots[0].offsetLeft : 1;
+        sectionTop = section.getBoundingClientRect().top + frame.scrollY;
+      },
+      read(frame) {
+        current = Math.min(slots.length - 1, Math.max(0, Math.round(list.scrollLeft / step)));
+        const rect = list.getBoundingClientRect();
+        active = rect.top < frame.viewportHeight && rect.bottom > frame.headerOffset ? current : -1;
+      },
+      write(frame) {
+        const count = countRef.current;
+        const text = `${current + 1} de ${total}`;
+        if (count && count.textContent !== text) count.textContent = text;
+        // Com movimento reduzido nada toca sozinho; o vídeo tem controles.
+        const next = reducedMotion ? -1 : active;
+        if (next !== playing) {
+          if (playing !== -1) videos[playing]?.pause();
+          if (next !== -1) videos[next]?.play().catch(() => {});
+          playing = next;
+        }
+        if (!preloaded && sectionTop - frame.scrollY < frame.viewportHeight * 2) {
+          preloaded = true;
+          setPreload(true);
+        }
+      },
+    });
+
+    return () => {
+      unregister();
+      for (const video of videos) video?.pause();
+    };
+  }, [carousel, reducedMotion, total]);
 
   // Ao focar um link pelo teclado, alinha o painel à posição natural para manter
   // o texto inteiro visível, sem mover o foco.
   function revealFocused(event: FocusEvent<HTMLOListElement>) {
-    if (reducedMotion) return;
+    if (reducedMotion || carousel) return;
     const target = event.target as HTMLElement;
     // Clique e toque também focam o link, mas no meio do gesto: rolar aqui tira
     // o link de baixo do ponteiro e o clique cai no texto do painel.
@@ -266,13 +303,6 @@ export function ProjectsShowcase({ projects }: { projects: ProjectPanelData[] })
           </Fragment>
         ))}
       </ol>
-
-      {/* Pontos de parada do celular, posicionados no measure. */}
-      <div className="projects__stops" aria-hidden="true">
-        {projects.map((project) => (
-          <span key={project.id} />
-        ))}
-      </div>
     </section>
   );
 }

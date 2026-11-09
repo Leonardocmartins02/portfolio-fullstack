@@ -918,9 +918,9 @@ h3 {
     }
   }
 
-  /* Marco de altura zero depois de cada painel (régua da subida do seguinte e
-     ponto de parada no celular) e a camada que escurece o painel coberto. Sem
-     JS ou com movimento reduzido, nenhum dos dois aparece. */
+  /* Marco de altura zero antes de cada painel (régua da subida, na pilha do
+     desktop) e a camada que escurece o painel coberto. Fora da pilha, nenhum
+     dos dois aparece. */
   .projects__mark {
     height: 0;
   }
@@ -929,16 +929,119 @@ h3 {
     display: none;
   }
 
-  @media screen and (prefers-reduced-motion: no-preference) {
+  /* ---------- Celular e tablet: carrossel de cards ----------
+     Abaixo de 1024px a pilha não funciona: os painéis têm a altura da tela, um
+     sobe por cima do outro e a parada nunca enquadra direito. Aqui cada projeto é
+     um card numa trilha horizontal com scroll-snap: o dedo arrasta, a física de
+     rolagem é a do próprio navegador e cada card para centralizado. A borda do
+     seguinte aparece ao lado, para mostrar que dá para deslizar. Funciona sem JS;
+     o ProjectsShowcase só atualiza o contador e toca o vídeo do card da vez. */
+  @media (max-width: 1023px) {
+    .projects {
+      /* Respiro lateral da trilha: centraliza o card e deixa aparecer a borda
+         dos vizinhos (respiro menos o espaço entre cards). */
+      --rail-inset: calc(var(--margin) + 16px);
+      --rail-gap: 12px;
+      padding-bottom: var(--section-gap);
+    }
+
+    .projects__heading-inner {
+      padding-bottom: 1.25rem;
+    }
+
+    .projects__count {
+      display: block;
+      color: rgb(var(--muted));
+    }
+
+    .projects__list {
+      display: flex;
+      align-items: stretch;
+      gap: var(--rail-gap);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      padding-inline: var(--rail-inset);
+      scrollbar-width: none;
+    }
+
+    .projects__list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .projects__mark {
+      display: none;
+    }
+
+    /* Todos os cards no mesmo tom elevado, com cantos e um contorno fino para
+       se separarem do fundo escuro da seção. scroll-snap-stop: um card por
+       gesto, mesmo num movimento rápido. */
+    /* .projects na frente: as cores de .chapter-dark/.chapter-raised ficam fora
+       da camada components e ganhariam de um seletor de uma classe só. */
+    .projects .project-slot {
+      /* 100% da área útil da trilha, que já desconta o respiro dos lados. */
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      border-radius: 20px;
+      overflow: clip;
+      --ground: 16 23 34;
+      --surface: 27 36 51;
+      --line: 54 66 86;
+      box-shadow: inset 0 0 0 1px rgb(var(--line) / 0.7); /* taste-skill-ignore: contorno do card no fundo escuro. */
+    }
+
+    /* A última linha (a janela) leva a sobra de altura do card. */
+    .project {
+      height: 100%;
+      grid-template-rows: auto auto 1fr;
+      row-gap: 1.25rem;
+      padding: 24px 20px 20px;
+    }
+
+    .project__name {
+      font-size: 20px;
+    }
+
+    /* A janela da captura vai para a base do card: cards de alturas diferentes
+       terminam alinhados. */
+    .project__picture {
+      align-self: end;
+      box-shadow: 0 0 0 1px rgb(var(--line)); /* taste-skill-ignore: só o contorno da janela; o brilho azul some dentro do card. */
+    }
+
+    /* As entradas de seção usam a tela como referência: um card fora dela, ao
+       lado, ficaria invisível até ser arrastado e entraria no meio do gesto. A
+       trilha inteira já entra com o título. */
+    .reveal-ready .projects__list [data-reveal]:not([data-in]) {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* O card da vez fica inteiro; os vizinhos, nas bordas, um pouco menores e
+     apagados. Guiado pela posição do card na trilha (view timeline em linha),
+     no compositor; sem suporte, os cards só deslizam. */
+  @supports (animation-timeline: view()) {
+    @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+      .project-slot {
+        animation-name: project-card-focus;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view(inline);
+      }
+    }
+  }
+
+  /* ---------- Desktop: título preso e pilha de painéis ---------- */
+  @media screen and (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
     /* Com JS: cada painel ocupa a tela e sobe por cima do anterior (painel mais
        alto que a tela para com a base embaixo, via --stick). */
     .js .project-slot {
       position: sticky;
       top: var(--stick, 0px);
       /* Pilha de cartas: o painel coberto recua para o centro da parte visível
-         (abaixo do cabeçalho), não para o topo. No celular o topo do painel
-         fica fora da tela, e recuar para ele fazia o conteúdo escorregar para
-         cima em vez de afundar no lugar. */
+         (abaixo do cabeçalho), não para o topo. */
       transform-origin: 50% calc(100% - (100svh - var(--header-offset, 4rem)) / 2);
     }
 
@@ -986,13 +1089,13 @@ h3 {
   }
 
   /* Recuo guiado pela rolagem, no compositor: cada painel com data-cover usa a
-     view timeline do marco que vem depois dele (--cover). "cover" de um marco
-     de altura zero vai de 0 (marco na base da tela) a 1 (marco no topo), a mesma
+     view timeline do marco do painel seguinte (--cover). "cover" de um marco de
+     altura zero vai de 0 (marco na base da tela) a 1 (marco no topo), a mesma
      régua do laço em JS, que fica só para navegadores sem animation-timeline.
      Propriedades longas (sem o atalho "animation"), porque o atalho zera
      animation-timeline. */
   @supports (animation-timeline: view()) {
-    @media screen and (prefers-reduced-motion: no-preference) {
+    @media screen and (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
       .js .projects__list {
         timeline-scope: var(--marks);
       }
@@ -1025,54 +1128,6 @@ h3 {
         animation-name: project-copy-out;
         animation-range: cover 0% cover 35%;
       }
-    }
-  }
-
-  .projects__stops {
-    display: none;
-  }
-
-  /* Celular: cada painel assenta na tela quando a rolagem para perto dele, em
-     vez de ficar meio coberto pelo seguinte. Os pontos de parada são medidos e
-     posicionados no ProjectsShowcase. "proximity", nunca "mandatory": fora dos
-     Projetos a página rola livre. Por capacidade (toque), não por largura. A
-     entrada (título "Projetos") e a saída (Trajetória) também são paradas, para
-     a pilha não puxar quem parou para ler o que vem antes ou depois dela. */
-  @media screen and (prefers-reduced-motion: no-preference) and (pointer: coarse) {
-    html.js {
-      scroll-snap-type: y proximity;
-    }
-
-    .js .projects__stops {
-      display: block;
-    }
-
-    /* Largura total: o Chrome ignora área de parada sem largura. */
-    .js .projects__stops > span {
-      position: absolute;
-      inset-inline: 0;
-      height: 0;
-      pointer-events: none;
-    }
-
-    .js .projects__stops > [data-align="end"] {
-      scroll-snap-align: end;
-    }
-
-    .js .projects__stops > [data-align="start"] {
-      scroll-snap-align: start;
-    }
-
-    /* Só blocos menores que a tela: uma área de parada mais alta que ela (a
-       seção inteira, por exemplo) torna válida qualquer posição dentro dela e
-       anula as outras paradas. O título preso (data-pinned) é sticky e fica de fora. */
-    .js .projects:not([data-pinned]) .projects__heading {
-      scroll-snap-align: start;
-    }
-
-    .js .timeline__title {
-      scroll-snap-align: start;
-      scroll-margin-top: var(--section-gap);
     }
   }
 
@@ -1266,6 +1321,19 @@ h3 {
 @keyframes project-shade {
   to {
     opacity: 1;
+  }
+}
+
+/* Card do carrossel: inteiro no centro da trilha, menor e apagado nas bordas. */
+@keyframes project-card-focus {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: none;
   }
 }
 
