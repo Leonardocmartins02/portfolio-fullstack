@@ -1,6 +1,10 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { MediaFrame } from "@/components/media-frame";
 
 export type ProjectAction = {
   label: "Ver demonstração" | "Ver código" | "Ver site";
@@ -27,13 +31,6 @@ export type ProjectPanelData = {
   url?: string;
   actions: ProjectAction[];
 };
-
-// "React, Express e Vitest": lista em frase, sem caixas nem separadores.
-function listInWords(items: string[]) {
-  return items.length < 2
-    ? items.join("")
-    : `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
-}
 
 // Um painel de tela cheia: a linha do nome fica no mesmo lugar em todos, então
 // a rolagem lê como virar pranchas de um livro. Os campos alternam o fundo e o elevado.
@@ -66,11 +63,13 @@ export function ProjectPanel({
     >
       <article aria-labelledby={headingId} className="project">
         <div className="project__row" data-reveal>
-          <p className="project__kind t-small text-muted">{project.category}</p>
+          <p className="project__kind">
+            <Badge variant="soft">{project.category}</Badge>
+          </p>
           <h3 id={headingId} className="project__name t-lead font-semibold" translate="no">
             {project.title}
           </h3>
-          <p className="project__fact t-small text-muted">
+          <p className="project__fact t-small text-muted-foreground">
             <span className="sr-only">
               Projeto {index + 1} de {total}.{" "}
             </span>
@@ -79,43 +78,60 @@ export function ProjectPanel({
         </div>
 
         <div className="project__text space-y-4" data-reveal style={second}>
-          <p className="t-body">{project.description}</p>
+          <p className="t-body text-foreground/90">{project.description}</p>
           {project.highlight ? (
-            <p className="t-body">
-              <span className="font-semibold">{project.highlight.label}:</span>{" "}
+            <p className="t-small border-l-2 border-primary/70 pl-4 text-muted-foreground">
+              <span className="font-semibold text-foreground">{project.highlight.label}:</span>{" "}
               {project.highlight.text}
             </p>
           ) : null}
           {project.techs?.length ? (
-            <p className="t-small text-muted">Feito com {listInWords(project.techs)}.</p>
+            <div>
+              <p className="sr-only">Feito com:</p>
+              <ul className="flex flex-wrap gap-1.5">
+                {project.techs.map((tech) => (
+                  <li key={tech}>
+                    <Badge variant="secondary" className="font-medium">
+                      {tech}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : null}
           {project.actions.length ? (
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
+            // No celular os dois botões não cabem lado a lado (~270px úteis): ficam
+            // empilhados em largura total, com o mesmo alvo de toque de 44px.
+            <div className="grid gap-3 pt-2 sm:flex sm:flex-wrap sm:items-center">
               {project.actions.map((action, i) => {
                 // A página do projeto (demonstração interna) é a ação principal.
                 const primary = i === 0 && !action.external;
-                const className = primary ? "button focus-ring" : "link focus-ring rounded t-body";
+                const Icon = action.external ? ArrowUpRight : ArrowRight;
                 const label = (
                   <>
                     {action.label}
                     <span className="sr-only">: {project.name}</span>
                     {action.external ? <span className="sr-only"> (abre em nova aba)</span> : null}
+                    <Icon
+                      aria-hidden="true"
+                      className={
+                        action.external
+                          ? "transition-transform duration-200 ease-out group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5"
+                          : "transition-transform duration-200 ease-out group-hover/button:translate-x-0.5"
+                      }
+                    />
                   </>
                 );
-                return action.external ? (
-                  <a
-                    key={action.href}
-                    href={action.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={className}
-                  >
-                    {label}
-                  </a>
-                ) : (
-                  <Link key={action.href} href={action.href} className={className}>
-                    {label}
-                  </Link>
+                return (
+                  <Button key={action.href} asChild variant={primary ? "default" : "outline"}>
+                    {action.external ? (
+                      <a href={action.href} target="_blank" rel="noopener noreferrer">
+                        {label}
+                      </a>
+                    ) : (
+                      <Link href={action.href}>{label}</Link>
+                    )}
+                  </Button>
                 );
               })}
             </div>
@@ -133,8 +149,9 @@ export function ProjectPanel({
             </span>
             {project.url ? <span className="project__window-url">{project.url}</span> : null}
           </div>
-          <div
+          <MediaFrame
             className="project__window-view"
+            poster={project.video?.poster}
             style={
               project.video
                 ? { aspectRatio: `${project.video.width} / ${project.video.height}` }
@@ -166,7 +183,7 @@ export function ProjectPanel({
                 sizes="(min-width: 1024px) 58vw, 100vw"
               />
             ) : null}
-          </div>
+          </MediaFrame>
         </figure>
       </article>
       {/* Escurece o painel enquanto o seguinte sobe. Elemento próprio (e não

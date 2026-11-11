@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { skills } from "@/lib/data";
+import { Badge } from "@/components/ui/badge";
 
 // Capítulo elevado entre a Trajetória e o Contato: o título grande à esquerda, com o
 // ✳ como marca, e os grupos numerados à direita, cada um com as ferramentas em
@@ -31,15 +32,19 @@ export function Skills() {
               style={{ "--i": i } as CSSProperties}
               className="skills__group"
             >
-              <h3 className="t-body flex items-baseline gap-4 font-semibold">
-                <span aria-hidden="true" className="t-small font-normal tabular-nums text-muted">
+              <h3 className="flex items-baseline gap-4 text-lg font-medium">
+                <span aria-hidden="true" className="t-small font-medium tabular-nums text-primary">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {group.group}
               </h3>
               <ul className="skills__tags mt-4">
                 {group.items.map((item) => (
-                  <li key={item}>{item}</li>
+                  <li key={item}>
+                    <Badge variant="outline" size="lg" className="max-w-full whitespace-normal leading-snug">
+                      {item}
+                    </Badge>
+                  </li>
                 ))}
               </ul>
             </div>
