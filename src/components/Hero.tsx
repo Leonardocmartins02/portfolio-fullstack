@@ -53,6 +53,10 @@ export function Hero() {
                   priority
                   sizes="(min-width: 1024px) 36vw, (min-width: 640px) 460px, 80vw"
                 />
+                {/* Abertura no celular: a tela começa apagada e liga quando a tampa
+                    termina de abrir, com um reflexo passando pelo vidro (globals.css). */}
+                <span className="laptop__screen-off" aria-hidden="true" />
+                <span className="laptop__sheen" aria-hidden="true" />
               </div>
             </Laptop>
             <FrontCards />

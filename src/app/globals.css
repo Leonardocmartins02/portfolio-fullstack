@@ -423,6 +423,41 @@ h3 {
     background: #f2f4f7;
   }
 
+  /* A tela tem o próprio plano, meio pixel à frente da tampa, e some de costas:
+     com a tampa fechada (abertura e rolagem no celular) a câmera vê o alumínio
+     da tampa, não o avesso da captura. */
+  .laptop__bezel {
+    transform: translateZ(0.5px);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Camadas da tela "ligando" (Hero.tsx): apagada por cima da captura e um
+     reflexo que atravessa o vidro uma vez. Em repouso, invisíveis. */
+  .laptop__screen-off,
+  .laptop__sheen {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .laptop__screen-off {
+    background: #090c11;
+  }
+
+  .laptop__sheen {
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.32) 48%,
+      rgb(255 255 255 / 0.08) 56%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+  }
+
   .laptop__lid-side {
     position: absolute;
     top: calc(var(--w) * 0.02);
@@ -729,6 +764,33 @@ h3 {
   @keyframes laptop-arrive {
     from { scale: 0.96; translate: 0 16px; }
     to { scale: 1; translate: 0 0; }
+  }
+
+  /* Celular: o notebook chega fechado, a tampa abre (passa um pouco do ponto e
+     assenta, como uma dobradiça de verdade), a tela liga com um reflexo e só
+     então os cards do dashboard entram embaixo. "backwards": depois de abrir, a
+     tampa volta para o próprio transform, que a rolagem (useHeroScene) controla. */
+  @media (max-width: 639px) and (prefers-reduced-motion: no-preference) {
+    .laptop__lid { animation: lid-open 1400ms cubic-bezier(0.5, 0, 0.2, 1.15) 300ms backwards; }
+    .laptop__screen-off { animation: screen-on 600ms ease-out 1350ms backwards; }
+    .laptop__sheen { animation: screen-sheen 1000ms var(--ease-out) 1500ms backwards; }
+    .stock-card[data-card="restock"] .stock-card__body { animation-delay: 1600ms; }
+    .stock-card[data-card="moves"] .stock-card__body { animation-delay: 1700ms; }
+  }
+
+  @keyframes lid-open {
+    from { transform: rotateX(-84deg); }
+    to { transform: rotateX(var(--lid)); }
+  }
+
+  @keyframes screen-on {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes screen-sheen {
+    from { opacity: 1; transform: translateX(-100%); }
+    to { opacity: 1; transform: translateX(100%); }
   }
 
   /* Tablet: cena embaixo do texto, três cards (sem o de baixo, a cena encurta). */

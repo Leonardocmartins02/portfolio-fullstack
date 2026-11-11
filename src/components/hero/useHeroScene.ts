@@ -5,7 +5,10 @@ import { registerScrollController } from "@/lib/scroll-orchestrator";
 // - rolagem: no trecho em que o hero fica preso, os cards se recolhem para a tela
 //   do notebook (os módulos entrando no sistema);
 // - ponteiro fino: o notebook inclina até 2°/3° e os cards se deslocam conforme a
-//   profundidade (o que está à frente anda com o ponteiro, o de trás ao contrário).
+//   profundidade (o que está à frente anda com o ponteiro, o de trás ao contrário);
+// - celular (cards em fila, fora do palco): no mesmo trecho da rolagem o notebook
+//   gira e a tampa vai fechando enquanto o Sobre sobe, o avesso da abertura
+//   (lid-open em globals.css).
 // Com movimento reduzido nada disso roda e a cena fica no estado inicial.
 
 const TILT_X = 2;
@@ -15,6 +18,16 @@ const SHIFT_X = 0.07;
 const SHIFT_Y = 0.05;
 // Fração do caminho que o ponteiro suavizado anda por quadro.
 const EASE = 0.12;
+// Celular: giro (graus) e quanto a tampa fecha (graus) no fim do trecho.
+const SWING_Y = 16;
+const SWING_X = 6;
+const LID_CLOSE = 48;
+
+// Começa e termina devagar, para o giro não arrancar no primeiro pixel.
+const smooth = (t: number) => {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
+};
 
 type Vector = { x: number; y: number; active: boolean };
 
@@ -30,6 +43,7 @@ export function useHeroScene(
     const laptop = laptopRef.current;
     if (!enabled || !section || !scene || !laptop) return;
 
+    const lid = laptop.querySelector<HTMLElement>(".laptop__lid");
     const cards = Array.from(scene.querySelectorAll<HTMLElement>(".stock-card"));
     const depths = cards.map((card) => Number(card.dataset.depth) || 0);
     const toward: Vector[] = cards.map(() => ({ x: 0, y: 0, active: false }));
@@ -38,9 +52,20 @@ export function useHeroScene(
     let span = 1;
     let progress = 0;
     let pointerFrame = 0;
+    // Celular: nenhum card no palco, então a rolagem move o próprio notebook.
+    let compact = false;
+    let lidAngle = 0;
 
     function paint() {
-      laptop!.style.transform = `rotateX(${-pointer.y * TILT_X}deg) rotateY(${pointer.x * TILT_Y}deg)`;
+      const swing = compact ? smooth(progress) : 0;
+      laptop!.style.transform =
+        `rotateX(${(-pointer.y * TILT_X - swing * SWING_X).toFixed(2)}deg) ` +
+        `rotateY(${(pointer.x * TILT_Y + swing * SWING_Y).toFixed(2)}deg)` +
+        (compact ? ` scale(${(1 - swing * 0.06).toFixed(3)})` : "");
+      if (lid) {
+        if (compact) lid.style.transform = `rotateX(${(lidAngle - swing * LID_CLOSE).toFixed(2)}deg)`;
+        else lid.style.removeProperty("transform");
+      }
       cards.forEach((card, i) => {
         const vector = toward[i];
         if (!vector.active) return;
@@ -76,6 +101,9 @@ export function useHeroScene(
             card.style.removeProperty("opacity");
           }
         });
+        compact = toward.every((vector) => !vector.active);
+        // Abertura da tampa definida no CSS (--lid), por largura.
+        lidAngle = parseFloat(getComputedStyle(scene).getPropertyValue("--lid")) || 0;
         progress = -1;
       },
       write(frame) {
@@ -121,6 +149,7 @@ export function useHeroScene(
       section.removeEventListener("pointerleave", onLeave);
       if (pointerFrame) cancelAnimationFrame(pointerFrame);
       laptop.style.removeProperty("transform");
+      lid?.style.removeProperty("transform");
       for (const card of cards) {
         card.style.removeProperty("translate");
         card.style.removeProperty("scale");
