@@ -1,23 +1,39 @@
 import type { ContactMessage } from "@prisma/client";
+import { Mail } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export function MessagesList({ messages }: { messages: ContactMessage[] }) {
   if (messages.length === 0) {
-    return <p className="text-sm text-muted">Nenhuma mensagem recebida ainda.</p>;
+    return (
+      <Card className="flex items-center gap-3 border-dashed bg-transparent p-6 text-sm text-muted-foreground">
+        <Mail aria-hidden="true" className="size-4" />
+        Nenhuma mensagem recebida ainda.
+      </Card>
+    );
   }
 
   return (
-    <div className="space-y-4">
+    <ul className="grid gap-3">
       {messages.map((message) => (
-        <div key={message.id} className="rounded-2xl border border-border bg-surface p-4">
-          <div className="flex flex-wrap items-center justify-between gap-1 text-xs text-muted">
-            <span>
-              {message.name} · {message.email}
-            </span>
-            <span>{new Date(message.createdAt).toLocaleString("pt-BR")}</span>
-          </div>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">{message.message}</p>
-        </div>
+        <li key={message.id}>
+          <Card className="p-5">
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[13px] text-muted-foreground">
+              <span>
+                <span className="font-medium text-foreground">{message.name}</span> ·{" "}
+                <a href={`mailto:${message.email}`} className="link focus-ring rounded-sm">
+                  {message.email}
+                </a>
+              </span>
+              <time dateTime={new Date(message.createdAt).toISOString()} className="tabular-nums">
+                {new Date(message.createdAt).toLocaleString("pt-BR")}
+              </time>
+            </div>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+              {message.message}
+            </p>
+          </Card>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

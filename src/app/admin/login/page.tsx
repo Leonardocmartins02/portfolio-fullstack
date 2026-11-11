@@ -3,6 +3,13 @@
 import { useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { AlertCircle, ArrowLeft, Loader2, LogIn } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -36,53 +43,58 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main id="main" className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
-      <h1 className="mb-6 text-xl font-semibold text-foreground">Login administrativo</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="mb-1 block text-xs text-muted">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="mb-1 block text-xs text-muted">
-            Senha
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="focus-ring w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
+    <main id="main" className="page flex min-h-[100svh] flex-col items-center justify-center py-10">
+      <div className="w-full max-w-sm">
+        <Button asChild variant="ghost" size="sm" className="rise-in -ml-3 mb-6 px-3 text-sm font-medium">
+          <Link href="/">
+            <ArrowLeft aria-hidden="true" />
+            Voltar ao portfólio
+          </Link>
+        </Button>
+        <Card className="rise-in rounded-xl" style={{ "--i": 1 } as React.CSSProperties}>
+          <CardHeader className="pb-4">
+            <h1 className="text-[22px] font-medium leading-snug">Login administrativo</h1>
+            <CardDescription>Acesso ao painel de projetos e mensagens.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="grid gap-5">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" required autoComplete="email" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
 
-        {error && (
-          <p role="alert" aria-live="assertive" className="text-sm text-red-400">
-            {error}
-          </p>
-        )}
+              {error && (
+                <Alert variant="destructive" role="alert" aria-live="assertive">
+                  <AlertCircle aria-hidden="true" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="focus-ring w-full rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          {loading ? "Entrando…" : "Entrar"}
-        </button>
-      </form>
-      <p className="mt-4 text-xs text-muted">
-        Use as credenciais criadas pelo seed (veja o README) ou as que você definiu em .env.
-      </p>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? (
+                  <Loader2 aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+                ) : (
+                  <LogIn aria-hidden="true" />
+                )}
+                {loading ? "Entrando…" : "Entrar"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+        <p className="mt-4 text-[13px] text-muted-foreground">
+          Use as credenciais criadas pelo seed (veja o README) ou as que você definiu em .env.
+        </p>
+      </div>
     </main>
   );
 }

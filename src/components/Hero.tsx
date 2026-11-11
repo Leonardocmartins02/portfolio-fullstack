@@ -3,11 +3,13 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowDown } from "lucide-react";
 import { profile } from "@/lib/data";
 import { useMediaQuery, useReducedMotion } from "@/lib/scroll-orchestrator";
 import { Laptop } from "@/components/hero/Laptop";
 import { BackCards, FrontCards } from "@/components/hero/StockCards";
 import { useHeroScene } from "@/components/hero/useHeroScene";
+import { Button } from "@/components/ui/button";
 
 // O SimpleStock é a prova ao lado do nome: o notebook já abre no dashboard, e os
 // cards dele ficam em volta, em profundidade. A demonstração em vídeo fica nos
@@ -27,8 +29,16 @@ export function Hero() {
         <div className="hero__copy">
           <h1 className="hero__headline t-display">Leonardo<br />Martins</h1>
           <div className="hero__aside">
-            <p className="t-lead">Desenvolvedor full stack em {profile.location}, vindo do suporte de TI e da infraestrutura.</p>
-            <a href="#projetos" className="button focus-ring">Ver projetos</a>
+            <p className="t-lead text-muted-foreground">Desenvolvedor full stack em {profile.location}, vindo do suporte de TI e da infraestrutura.</p>
+            <Button asChild size="lg">
+              <a href="#projetos">
+                Ver projetos
+                <ArrowDown
+                  aria-hidden="true"
+                  className="transition-transform duration-200 ease-out group-hover/button:translate-y-0.5"
+                />
+              </a>
+            </Button>
           </div>
         </div>
         <figure className="hero__demo">
@@ -47,9 +57,9 @@ export function Hero() {
             </Laptop>
             <FrontCards />
           </div>
-          <figcaption className="hero__caption t-small">
+          <figcaption className="hero__caption t-small text-muted-foreground">
             SimpleStock, sistema de estoque com React, Express e PostgreSQL.{" "}
-            <Link href="/projetos/simplestock" className="link focus-ring">Ver o projeto</Link>
+            <Link href="/projetos/simplestock" className="link focus-ring rounded-sm text-foreground">Ver o projeto</Link>
           </figcaption>
         </figure>
       </div>

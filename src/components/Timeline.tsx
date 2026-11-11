@@ -3,6 +3,8 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import { education, experiences } from "@/lib/data";
 import { registerScrollController, useReducedMotion } from "@/lib/scroll-orchestrator";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 const MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
@@ -76,37 +78,41 @@ export function Timeline() {
           Como cheguei até aqui
         </h2>
 
-        <div className="timeline__content mt-16">
+        <div className="timeline__content mt-10 sm:mt-14">
           <div>
             <ol ref={listRef} className="timeline__list">
               {experiences.map((item, i) => (
-                <li
-                  key={item.id}
-                  data-timeline-row
-                  data-reveal="row"
-                  style={{ "--i": i } as CSSProperties}
-                  className="timeline__row"
-                >
-                  <p className="timeline__period t-small text-muted tabular-nums">
-                    <time dateTime={item.start}>{formatMonth(item.start)}</time>
-                    {" – "}
-                    {item.end ? <time dateTime={item.end}>{formatMonth(item.end)}</time> : "atual"}
-                  </p>
-                  <div>
-                    <h3 className="t-body font-semibold">{item.role}</h3>
-                    <p className="t-body">{item.company}</p>
-                    <p className="t-small mt-2 text-muted">{item.description}</p>
-                  </div>
+                // A entrada fica no <li>; o Card leva a transição do destaque.
+                <li key={item.id} data-reveal="row" style={{ "--i": i } as CSSProperties}>
+                  <Card data-timeline-row className="timeline__row">
+                    <p className="timeline__period t-small font-medium tabular-nums text-muted-foreground">
+                      <time dateTime={item.start}>{formatMonth(item.start)}</time>
+                      {" – "}
+                      {item.end ? <time dateTime={item.end}>{formatMonth(item.end)}</time> : "atual"}
+                    </p>
+                    <div>
+                      <h3 className="flex flex-wrap items-center gap-x-3 gap-y-1 text-lg font-medium leading-snug">
+                        {item.role}
+                        {item.end ? null : <Badge variant="soft">Atual</Badge>}
+                      </h3>
+                      <p className="t-body text-foreground/90">{item.company}</p>
+                      <p className="t-small mt-3 text-muted-foreground">{item.description}</p>
+                    </div>
+                  </Card>
                 </li>
               ))}
             </ol>
 
-            <div data-reveal className="timeline__row timeline__education">
-              <p className="t-small text-muted">Formação, {education.status.toLowerCase()}</p>
-              <div>
-                <h3 className="t-body font-semibold">{education.course}</h3>
-                <p className="t-body">{education.institution}</p>
-              </div>
+            <div data-reveal className="timeline__education">
+              <Card className="timeline__row border-dashed bg-transparent">
+                <p className="t-small font-medium text-muted-foreground">
+                  Formação, {education.status.toLowerCase()}
+                </p>
+                <div>
+                  <h3 className="text-lg font-medium leading-snug">{education.course}</h3>
+                  <p className="t-body text-foreground/90">{education.institution}</p>
+                </div>
+              </Card>
             </div>
           </div>
         </div>

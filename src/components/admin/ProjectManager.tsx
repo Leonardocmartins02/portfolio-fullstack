@@ -2,6 +2,32 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import type { Project } from "@prisma/client";
+import { AlertCircle, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+const fields = [
+  { key: "title", label: "Título", required: true },
+  { key: "category", label: "Categoria", required: true },
+  { key: "imageUrl", label: "Imagem (URL, opcional)", placeholder: "https://…" },
+  { key: "link", label: "Link do projeto (opcional)", placeholder: "https://…" },
+] as const;
 
 type FormState = {
   title: string;
@@ -99,12 +125,8 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
     }
   }
 
+  // Confirmado no AlertDialog (o botão "Remover" de cada card abre o diálogo).
   async function handleDelete(id: string) {
-    if (deletingRef.current) return;
-
-    const confirmed = window.confirm("Remover este projeto?");
-    if (!confirmed) return;
-
     if (deletingRef.current) return;
     deletingRef.current = id;
     setDeletingId(id);
@@ -128,155 +150,163 @@ export function ProjectManager({ initialProjects }: { initialProjects: Project[]
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr,1.2fr]">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-3 rounded-2xl border border-border bg-surface p-5"
-      >
-        <h3 className="text-sm font-semibold text-foreground">
-          {editingId ? "Editar projeto" : "Novo projeto"}
-        </h3>
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+      <Card className="lg:sticky lg:top-6">
+        <form onSubmit={handleSubmit} className="grid gap-5 p-6">
+          <h3 className="text-lg font-medium">{editingId ? "Editar projeto" : "Novo projeto"}</h3>
 
-        <div>
-          <label htmlFor="project-title" className="mb-1 block text-xs text-muted">
-            Título
-          </label>
-          <input
-            id="project-title"
-            required
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="project-category" className="mb-1 block text-xs text-muted">
-            Categoria
-          </label>
-          <input
-            id="project-category"
-            required
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="project-description" className="mb-1 block text-xs text-muted">
-            Descrição
-          </label>
-          <textarea
-            id="project-description"
-            required
-            rows={3}
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="project-image" className="mb-1 block text-xs text-muted">
-            Imagem (URL, opcional)
-          </label>
-          <input
-            id="project-image"
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-            placeholder="https://…"
-            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="project-link" className="mb-1 block text-xs text-muted">
-            Link do projeto (opcional)
-          </label>
-          <input
-            id="project-link"
-            value={form.link}
-            onChange={(e) => setForm({ ...form, link: e.target.value })}
-            placeholder="https://…"
-            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="project-order" className="mb-1 block text-xs text-muted">
-            Ordem de exibição
-          </label>
-          <input
-            id="project-order"
-            type="number"
-            value={form.order}
-            onChange={(e) => setForm({ ...form, order: e.target.value })}
-            className="focus-ring w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent"
-          />
-        </div>
-
-        {error && (
-          <p role="alert" aria-live="assertive" className="text-sm text-red-400">
-            {error}
-          </p>
-        )}
-
-        <div className="flex gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="focus-ring rounded-full bg-accent px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {saving ? "Salvando…" : editingId ? "Salvar alterações" : "Adicionar projeto"}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              onClick={cancelEdit}
-              className="focus-ring rounded-full border border-border px-5 py-2 text-sm text-foreground transition-colors hover:bg-surface"
-            >
-              Cancelar
-            </button>
-          )}
-        </div>
-      </form>
-
-      <div className="space-y-3">
-        {projects.length === 0 && (
-          <p className="text-sm text-muted">Nenhum projeto cadastrado ainda.</p>
-        )}
-        {projects.map((project) => (
-          <div
-            key={project.id}
-            className="flex items-start justify-between gap-4 rounded-2xl border border-border bg-surface p-4"
-          >
-            <div>
-              <span className="text-xs uppercase tracking-wide text-accent">
-                {project.category} · ordem {project.order}
-              </span>
-              <h4 className="text-sm font-semibold text-foreground">{project.title}</h4>
-              <p className="mt-1 text-xs text-muted line-clamp-2">{project.description}</p>
+          {fields.slice(0, 2).map((field) => (
+            <div key={field.key} className="grid gap-2">
+              <Label htmlFor={`project-${field.key}`}>{field.label}</Label>
+              <Input
+                id={`project-${field.key}`}
+                required
+                value={form[field.key]}
+                onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
+              />
             </div>
-            <div className="flex shrink-0 gap-2">
-              <button
-                onClick={() => startEdit(project)}
-                disabled={deletingId === project.id}
-                className="focus-ring rounded-full border border-border px-3 py-2 text-xs text-foreground transition-colors hover:border-accent disabled:opacity-50"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(project.id)}
-                disabled={deletingId === project.id}
-                className="focus-ring rounded-full border border-border px-3 py-2 text-xs text-red-400 transition-colors hover:border-red-400 disabled:opacity-50"
-              >
-                {deletingId === project.id ? "Removendo…" : "Remover"}
-              </button>
-            </div>
+          ))}
+
+          <div className="grid gap-2">
+            <Label htmlFor="project-description">Descrição</Label>
+            <Textarea
+              id="project-description"
+              required
+              rows={3}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
           </div>
+
+          {fields.slice(2).map((field) => (
+            <div key={field.key} className="grid gap-2">
+              <Label htmlFor={`project-${field.key}`}>{field.label}</Label>
+              <Input
+                id={`project-${field.key}`}
+                inputMode="url"
+                placeholder={"placeholder" in field ? field.placeholder : undefined}
+                value={form[field.key]}
+                onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
+              />
+            </div>
+          ))}
+
+          <div className="grid gap-2">
+            <Label htmlFor="project-order">Ordem de exibição</Label>
+            <Input
+              id="project-order"
+              type="number"
+              inputMode="numeric"
+              className="max-w-[8rem]"
+              value={form.order}
+              onChange={(e) => setForm({ ...form, order: e.target.value })}
+            />
+          </div>
+
+          {error && (
+            <Alert variant="destructive" role="alert" aria-live="assertive">
+              <AlertCircle aria-hidden="true" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button type="submit" disabled={saving}>
+              {saving ? (
+                <Loader2 aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+              ) : editingId ? null : (
+                <Plus aria-hidden="true" />
+              )}
+              {saving ? "Salvando…" : editingId ? "Salvar alterações" : "Adicionar projeto"}
+            </Button>
+            {editingId && (
+              <Button type="button" variant="outline" onClick={cancelEdit}>
+                Cancelar
+              </Button>
+            )}
+          </div>
+        </form>
+      </Card>
+
+      <ul className="grid gap-3">
+        {projects.length === 0 && (
+          <li>
+            <Card className="border-dashed bg-transparent p-6 text-sm text-muted-foreground">
+              Nenhum projeto cadastrado ainda.
+            </Card>
+          </li>
+        )}
+        {projects.map((project, i) => (
+          <li
+            key={project.id}
+            className="motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-both motion-safe:duration-500"
+            style={{ animationDelay: `${i * 50}ms` }}
+          >
+            <Card
+              data-editing={editingId === project.id ? "" : undefined}
+              className="card-hover flex flex-col gap-4 p-5 data-[editing]:border-primary/60 sm:flex-row sm:items-start sm:justify-between"
+            >
+              <div className="min-w-0 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="soft">{project.category}</Badge>
+                  <span className="text-[13px] tabular-nums text-muted-foreground">
+                    ordem {project.order}
+                  </span>
+                </div>
+                <h4 className="font-medium text-foreground">{project.title}</h4>
+                <p className="line-clamp-2 text-sm text-muted-foreground">{project.description}</p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => startEdit(project)}
+                  disabled={deletingId === project.id}
+                >
+                  <Pencil aria-hidden="true" />
+                  Editar
+                  <span className="sr-only">: {project.title}</span>
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={deletingId === project.id}
+                      className="text-destructive hover:border-destructive hover:bg-destructive/10"
+                    >
+                      {deletingId === project.id ? (
+                        <Loader2 aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+                      ) : (
+                        <Trash2 aria-hidden="true" />
+                      )}
+                      {deletingId === project.id ? "Removendo…" : "Remover"}
+                      <span className="sr-only">: {project.title}</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Remover este projeto?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        “{project.title}” sai do portfólio e do banco. Não dá para desfazer.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        className={buttonVariants({ variant: "destructive" })}
+                        onClick={() => handleDelete(project.id)}
+                      >
+                        Remover
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </Card>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

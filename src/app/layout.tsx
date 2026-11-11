@@ -1,22 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
+import { DM_Sans, Source_Code_Pro } from "next/font/google";
 import "./globals.css";
 
-// IBM Plex Sans: desenho de engenharia, I maiúsculo com serifas ("TI" não vira
-// "Tl") e itálico de verdade. Só os pesos que o site usa (400, 500 e 600).
-const plex = IBM_Plex_Sans({
+// O DESIGN.md da MongoDB usa a Euclid Circular A (comercial, sem licença web
+// livre). A DM Sans é a geométrica gratuita mais próxima: mesmo desenho
+// circular, pesos 400/500/600 e itálico de verdade. Fonte variável (eixo opsz):
+// um arquivo só para todos os pesos.
+const sans = DM_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   variable: "--font-sans",
   display: "swap",
 });
 
 // O itálico aparece só no título de Skills: arquivo próprio, sem preload.
-const plexItalic = IBM_Plex_Sans({
+const sansItalic = DM_Sans({
   subsets: ["latin"],
   weight: "400",
   style: "italic",
   variable: "--font-sans-italic",
+  display: "swap",
+  preload: false,
+});
+
+// Source Code Pro (code-md do DESIGN.md): só o endereço das janelas de projeto.
+const mono = Source_Code_Pro({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-mono",
   display: "swap",
   preload: false,
 });
@@ -26,9 +36,9 @@ const title = "Leonardo Martins — Portfólio";
 const description =
   "Portfólio de Leonardo Martins, desenvolvedor full stack — projetos, trajetória e contato.";
 
-// Fundo dos capítulos escuros: barra do navegador e controles nativos no mesmo tom.
+// Teal profundo da MongoDB: barra do navegador e controles nativos no mesmo tom.
 export const viewport: Viewport = {
-  themeColor: "#06090f",
+  themeColor: "#001e2b",
   colorScheme: "dark",
 };
 
@@ -56,7 +66,7 @@ export default function RootLayout({
 }>) {
   return (
     // suppressHydrationWarning: o script abaixo acrescenta a classe "js" antes da hidratação.
-    <html lang="pt-BR" className={`dark ${plex.variable} ${plexItalic.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`dark ${sans.variable} ${sansItalic.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         {/* Marca a página como "com JS" antes da primeira pintura: o hero já nasce na
             composição da janela, sem trocar de layout quando o React hidrata. */}
@@ -65,7 +75,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-background"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
         >
           Pular para o conteúdo
         </a>

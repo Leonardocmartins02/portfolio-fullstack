@@ -16,24 +16,32 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <main id="main" className="mx-auto max-w-content px-6 py-12">
-      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+    <main id="main" className="page py-10 sm:py-12">
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4 rise-in">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Painel administrativo</h1>
-          <p className="text-sm text-muted">Logado como {session?.user?.email}</p>
+          <h1 className="text-[28px] font-medium leading-tight tracking-[-0.01em]">
+            Painel administrativo
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">Logado como {session?.user?.email}</p>
         </div>
         <SignOutButton />
       </div>
 
-      <section className="mb-14">
-        <h2 className="mb-4 text-sm font-medium uppercase tracking-widest text-accent">
+      <section aria-labelledby="admin-projetos" className="mb-14">
+        <h2
+          id="admin-projetos"
+          className="mb-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-primary"
+        >
           Projetos
         </h2>
         <ProjectManager initialProjects={projects} />
       </section>
 
-      <section>
-        <h2 className="mb-4 text-sm font-medium uppercase tracking-widest text-accent">
+      <section aria-labelledby="admin-mensagens">
+        <h2
+          id="admin-mensagens"
+          className="mb-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-primary"
+        >
           Mensagens recebidas ({messages.length})
         </h2>
         <MessagesList messages={messages} />

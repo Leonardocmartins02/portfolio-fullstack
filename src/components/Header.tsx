@@ -2,8 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, Menu } from "lucide-react";
 import { profile } from "@/lib/data";
 import { registerScrollController } from "@/lib/scroll-orchestrator";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const links = [
   { href: "#sobre", label: "Sobre" },
@@ -16,16 +27,23 @@ const links = [
 // Linha de leitura que decide a página atual no menu (a mesma da Trajetória).
 const READING_LINE = 0.45;
 
+// A seção de destino recebe o foco (sem rolar de novo), para o leitor de tela
+// e o teclado continuarem dali.
+function goToSection(hash: string) {
+  const target = document.getElementById(hash.slice(1));
+  if (!target) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  history.pushState(null, "", hash);
+  if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+  target.focus({ preventScroll: true });
+}
+
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const firstLinkRef = useRef<HTMLAnchorElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  function close() {
-    setIsOpen(false);
-    toggleRef.current?.focus();
-  }
+  // Link escolhido no menu: a rolagem espera o Sheet fechar e soltar a trava
+  // de rolagem da página, senão a âncora não anda.
+  const pendingHash = useRef<string | null>(null);
 
   // A barra toma o campo do capítulo que passa embaixo dela (fundo, elevado ou azul),
   // marca no menu a página que está sendo lida e só mostra o nome depois que o
@@ -81,90 +99,97 @@ export function Header() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    firstLinkRef.current?.focus();
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") close();
-    }
-
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(event.target as Node) &&
-        !toggleRef.current?.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
+  const desktopLinks = links.slice(0, -1);
+  const contact = links[links.length - 1];
 
   return (
     <header ref={headerRef} className="site-header sticky top-0 z-40">
-      <div data-header-bar className="frame flex items-center justify-between py-3.5">
-        <Link href="#inicio" className="site-header__brand focus-ring flex items-center gap-2.5 rounded-full">
-          <span className="t-small font-semibold tracking-tight" translate="no">
+      <div data-header-bar className="frame flex h-16 items-center justify-between gap-4">
+        <Link
+          href="#inicio"
+          className="site-header__brand focus-ring -mx-2 flex items-center rounded-md px-2 py-1.5"
+        >
+          <span className="text-[15px] font-semibold tracking-tight" translate="no">
             {profile.name}
           </span>
         </Link>
 
-        <nav aria-label="Navegação principal" className="t-small hidden gap-7 text-muted sm:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              data-page-link={link.href.slice(1)}
-              className="nav-link focus-ring rounded transition-colors hover:text-foreground"
-            >
-              {link.label}
+        <div className="flex items-center gap-2">
+          <nav aria-label="Navegação principal" className="hidden items-center gap-1 md:flex">
+            {desktopLinks.map((link) => (
+              <Button
+                key={link.href}
+                asChild
+                variant="ghost"
+                size="sm"
+                className="nav-link px-3 text-sm font-medium text-muted-foreground hover:bg-accent/70 hover:text-foreground"
+              >
+                <a href={link.href} data-page-link={link.href.slice(1)}>
+                  {link.label}
+                </a>
+              </Button>
+            ))}
+          </nav>
+
+          {/* A pílula verde de ação da barra (o "Try Free" do DESIGN.md). */}
+          <Button asChild size="sm" className="ml-1 hidden min-[360px]:inline-flex">
+            <a href={contact.href} data-page-link={contact.href.slice(1)}>
+              Fale comigo
+              <ArrowRight
+                aria-hidden="true"
+                className="transition-transform duration-200 ease-out group-hover/button:translate-x-0.5"
+              />
             </a>
-          ))}
-        </nav>
+          </Button>
 
-        <button
-          ref={toggleRef}
-          type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
-          aria-expanded={isOpen}
-          aria-controls="mobile-menu"
-          className="focus-ring t-small min-h-11 rounded-full px-3 font-semibold sm:hidden"
-        >
-          {isOpen ? "Fechar" : "Menu"}
-        </button>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Abrir menu">
+                <Menu className="!size-5" aria-hidden="true" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              closeLabel="Fechar menu"
+              className="px-[var(--margin)] pb-8 pt-3"
+              onCloseAutoFocus={(event) => {
+                const hash = pendingHash.current;
+                if (!hash) return;
+                event.preventDefault();
+                pendingHash.current = null;
+                requestAnimationFrame(() => goToSection(hash));
+              }}
+            >
+              <SheetHeader className="flex h-11 justify-center pr-14">
+                <SheetTitle translate="no">{profile.name}</SheetTitle>
+                <SheetDescription className="sr-only">Seções da página</SheetDescription>
+              </SheetHeader>
+              <nav aria-label="Navegação principal (mobile)" className="mt-4 flex flex-col">
+                {links.map((link, i) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    data-page-link={link.href.slice(1)}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      pendingHash.current = link.href;
+                      setIsOpen(false);
+                    }}
+                    style={{ animationDelay: `${80 + i * 40}ms` }}
+                    className={cn(
+                      "focus-ring flex min-h-14 items-center justify-between rounded-md border-b border-border text-xl font-medium text-muted-foreground transition-colors hover:text-foreground",
+                      "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-right-4 motion-safe:fill-mode-both motion-safe:duration-500",
+                    )}
+                  >
+                    {link.label}
+                    <ArrowRight aria-hidden="true" className="size-5 opacity-60" />
+                  </a>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
-
-      <nav
-        id="mobile-menu"
-        ref={panelRef}
-        aria-label="Navegação principal (mobile)"
-        aria-hidden={!isOpen}
-        className={`frame flex origin-top flex-col gap-1 overflow-hidden transition-[max-height,opacity] motion-safe:duration-200 sm:hidden ${
-          isOpen ? "max-h-96 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
-        }`}
-      >
-        {links.map((link, index) => (
-          <a
-            key={link.href}
-            ref={index === 0 ? firstLinkRef : undefined}
-            href={link.href}
-            data-page-link={link.href.slice(1)}
-            onClick={close}
-            tabIndex={isOpen ? 0 : -1}
-            className="nav-link focus-ring t-lead rounded py-2 text-muted transition-colors hover:text-foreground"
-          >
-            {link.label}
-          </a>
-        ))}
-      </nav>
     </header>
   );
 }

@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, type CSSProperties, type FormEvent } from "react";
+import { AlertCircle, ArrowUpRight, CheckCircle2, Info, Loader2, Send } from "lucide-react";
 import { profile } from "@/lib/data";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 // "partial" = mensagem salva no banco, mas a notificacao por e-mail falhou.
 type Status = "idle" | "loading" | "success" | "partial" | "error";
@@ -71,21 +78,25 @@ export function Contact() {
     { label: "WhatsApp", href: profile.whatsapp },
   ];
 
-  // Capítulo azul de fechamento: o convite e o formulário em cima, o e-mail como
-  // tipografia grande embaixo, os canais nos cantos.
+  // Capítulo verde de fechamento (cta-banner do DESIGN.md): o convite e o
+  // formulário em cima, o e-mail como tipografia grande embaixo, os canais nos cantos.
   return (
     <section
       id="contato"
       aria-labelledby="contato-titulo"
-      data-chapter="blue"
-      className="chapter chapter-blue"
+      data-chapter="green"
+      className="chapter chapter-green"
     >
-      <div className="frame grid-12 gap-y-16 py-[var(--section-gap)]">
+      <div className="frame grid-12 gap-y-12 py-[var(--section-gap)] lg:gap-y-16">
         <div className="col-span-12 lg:col-span-5">
           <h2 id="contato-titulo" data-reveal className="t-title">
             Vamos conversar
           </h2>
-          <p data-reveal style={{ "--i": 1 } as CSSProperties} className="t-lead mt-6 max-w-[24ch]">
+          <p
+            data-reveal
+            style={{ "--i": 1 } as CSSProperties}
+            className="t-lead mt-5 max-w-[26ch] text-muted-foreground"
+          >
             Para uma vaga, um projeto ou uma conversa sobre tecnologia.
           </p>
         </div>
@@ -95,133 +106,142 @@ export function Contact() {
           aria-busy={status === "loading"}
           data-reveal
           style={{ "--i": 2 } as CSSProperties}
-          className="col-span-12 space-y-6 lg:col-span-6 lg:col-start-7"
+          className="col-span-12 grid gap-5 lg:col-span-6 lg:col-start-7"
         >
-          <div>
-            <label htmlFor="name" className="t-small block text-muted">
-              Nome <span aria-hidden="true">*</span>
-              <span className="sr-only"> (obrigatório)</span>
-            </label>
-            <input
-              id="name"
-              name="name"
-              required
-              minLength={2}
-              autoComplete="name"
-              aria-invalid={Boolean(fieldErrors.name)}
-              aria-describedby={fieldErrors.name ? "name-error" : undefined}
-              className="field"
-            />
-            {fieldErrors.name && (
-              <p id="name-error" role="alert" className="t-small mt-1 text-foreground">
-                {fieldErrors.name.join(" ")}
-              </p>
-            )}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="name">
+                Nome <span aria-hidden="true">*</span>
+                <span className="sr-only"> (obrigatório)</span>
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                required
+                minLength={2}
+                autoComplete="name"
+                aria-invalid={Boolean(fieldErrors.name)}
+                aria-describedby={fieldErrors.name ? "name-error" : undefined}
+              />
+              {fieldErrors.name && (
+                <FieldError id="name-error">{fieldErrors.name.join(" ")}</FieldError>
+              )}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">
+                E-mail <span aria-hidden="true">*</span>
+                <span className="sr-only"> (obrigatório)</span>
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                spellCheck={false}
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? "email-error" : undefined}
+              />
+              {fieldErrors.email && (
+                <FieldError id="email-error">{fieldErrors.email.join(" ")}</FieldError>
+              )}
+            </div>
           </div>
-          <div>
-            <label htmlFor="email" className="t-small block text-muted">
-              E-mail <span aria-hidden="true">*</span>
-              <span className="sr-only"> (obrigatório)</span>
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              spellCheck={false}
-              aria-invalid={Boolean(fieldErrors.email)}
-              aria-describedby={fieldErrors.email ? "email-error" : undefined}
-              className="field"
-            />
-            {fieldErrors.email && (
-              <p id="email-error" role="alert" className="t-small mt-1 text-foreground">
-                {fieldErrors.email.join(" ")}
-              </p>
-            )}
-          </div>
-          <div>
-            <div className="flex items-baseline justify-between">
-              <label htmlFor="message" className="t-small block text-muted">
+          <div className="grid gap-2">
+            <div className="flex items-baseline justify-between gap-4">
+              <Label htmlFor="message">
                 Mensagem <span aria-hidden="true">*</span>
                 <span className="sr-only"> (obrigatório)</span>
-              </label>
-              <span className="t-small tabular-nums text-muted">
+              </Label>
+              <span className="text-[13px] tabular-nums text-muted-foreground">
                 {messageLength}/{MESSAGE_MAX_LENGTH}
               </span>
             </div>
-            <textarea
+            <Textarea
               id="message"
               name="message"
               required
               minLength={10}
               maxLength={MESSAGE_MAX_LENGTH}
-              rows={4}
+              rows={5}
               onChange={(event) => setMessageLength(event.target.value.length)}
               aria-invalid={Boolean(fieldErrors.message)}
               aria-describedby={fieldErrors.message ? "message-error" : undefined}
-              className="field resize-y"
+              className="resize-y"
             />
             {fieldErrors.message && (
-              <p id="message-error" role="alert" className="t-small mt-1 text-foreground">
-                {fieldErrors.message.join(" ")}
-              </p>
+              <FieldError id="message-error">{fieldErrors.message.join(" ")}</FieldError>
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="button focus-ring disabled:opacity-60"
-          >
-            {status === "loading" && (
-              <span
-                aria-hidden="true"
-                className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"
-              />
-            )}
-            {status === "loading" ? "Enviando…" : "Enviar mensagem"}
-          </button>
+          <div className="flex flex-wrap items-center gap-4 pt-1">
+            <Button type="submit" size="lg" disabled={status === "loading"} className="w-full sm:w-auto">
+              {status === "loading" ? (
+                <Loader2 aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+              ) : (
+                <Send
+                  aria-hidden="true"
+                  className="transition-transform duration-200 ease-out group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5"
+                />
+              )}
+              {status === "loading" ? "Enviando…" : "Enviar mensagem"}
+            </Button>
+          </div>
 
           <div role="status" aria-live="polite">
-            {status === "success" && <p className="t-body">Mensagem enviada com sucesso!</p>}
+            {status === "success" && (
+              <Alert variant="success">
+                <CheckCircle2 aria-hidden="true" />
+                <AlertDescription>Mensagem enviada com sucesso!</AlertDescription>
+              </Alert>
+            )}
             {status === "partial" && (
-              <p className="t-body">
-                Recebi sua mensagem e ela já está registrada, mas a notificação por e-mail
-                falhou. Se for urgente, fale comigo por um dos canais desta seção.
-              </p>
+              <Alert>
+                <Info aria-hidden="true" />
+                <AlertDescription>
+                  Recebi sua mensagem e ela já está registrada, mas a notificação por e-mail
+                  falhou. Se for urgente, fale comigo por um dos canais desta seção.
+                </AlertDescription>
+              </Alert>
             )}
           </div>
           <div role="alert" aria-live="assertive">
-            {status === "error" && <p className="t-body text-foreground">{errorMessage}</p>}
+            {status === "error" && (
+              <Alert variant="destructive">
+                <AlertCircle aria-hidden="true" />
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
           </div>
         </form>
 
-        <div className="col-span-12 space-y-10">
+        <div className="col-span-12 space-y-8">
           <a
             href={`mailto:${profile.email}`}
             data-reveal
-            className="contact__email link focus-ring rounded no-underline"
+            className="contact__email link focus-ring rounded-md no-underline"
             translate="no"
           >
             {user}@
             <wbr />
             {domain}
           </a>
-          <div className="t-small flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <p className="text-muted">{profile.location}, presencial ou remoto</p>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+          <Separator className="bg-foreground/20" />
+          <div className="t-small flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-muted-foreground">{profile.location}, presencial ou remoto</p>
+            <ul className="-mx-4 flex flex-wrap gap-1">
               {channels.map((channel) => (
                 <li key={channel.label}>
-                  <a
-                    href={channel.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="link focus-ring rounded"
-                  >
-                    {channel.label}
-                    <span className="sr-only"> (abre em nova aba)</span>
-                  </a>
+                  <Button asChild variant="ghost" size="sm" className="text-sm font-medium">
+                    <a href={channel.href} target="_blank" rel="noopener noreferrer">
+                      {channel.label}
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="opacity-70 transition-transform duration-200 ease-out group-hover/button:-translate-y-0.5 group-hover/button:translate-x-0.5"
+                      />
+                      <span className="sr-only"> (abre em nova aba)</span>
+                    </a>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -229,5 +249,19 @@ export function Contact() {
         </div>
       </div>
     </section>
+  );
+}
+
+// Mensagem de erro do campo, ligada a ele por aria-describedby.
+function FieldError({ id, children }: { id: string; children: React.ReactNode }) {
+  return (
+    <p
+      id={id}
+      role="alert"
+      className="flex items-center gap-1.5 text-[13px] font-medium text-foreground motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-1"
+    >
+      <AlertCircle aria-hidden="true" className="size-3.5 shrink-0" />
+      {children}
+    </p>
   );
 }
