@@ -809,6 +809,50 @@ h3 {
     .stock-card__foot { font-size: 12px; }
   }
 
+  /* Celular: notebook em WebGL (hero/MobileLaptop.tsx) no lugar do notebook
+     CSS, na mesma faixa do palco (70cqw), vazando até as bordas da tela para
+     ter espaço ao girar. Enquanto o three.js carrega, fica só a luz verde do
+     palco; o notebook CSS volta se não houver WebGL (data-webgl="off"). */
+  .hero__webgl {
+    display: none;
+  }
+
+  @media (max-width: 639px) {
+    .hero__webgl {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: calc(-1 * var(--margin));
+      right: calc(-1 * var(--margin));
+      height: 70cqw;
+      /* O dedo na vertical rola a página; na horizontal, gira o notebook. */
+      touch-action: pan-y;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .hero__webgl::before {
+      content: "";
+      position: absolute;
+      inset: 18% 8% 0;
+      background: radial-gradient(ellipse 50% 42% at 50% 72%, rgb(0 237 100 / 0.13), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero__webgl canvas {
+      opacity: 0;
+      transition: opacity 300ms var(--ease-out);
+    }
+
+    .hero__scene[data-webgl="ready"] .hero__webgl canvas {
+      opacity: 1;
+    }
+
+    .js .hero__scene:not([data-webgl="off"]) .laptop-view {
+      visibility: hidden;
+    }
+  }
+
   @media (max-height: 740px) and (max-width: 1023px) {
     .js .hero::after { display: none; }
     .js .hero__stage { position: relative; top: auto; }

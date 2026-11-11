@@ -9,6 +9,7 @@ import { useMediaQuery, useReducedMotion } from "@/lib/scroll-orchestrator";
 import { Laptop } from "@/components/hero/Laptop";
 import { BackCards, FrontCards } from "@/components/hero/StockCards";
 import { useHeroScene } from "@/components/hero/useHeroScene";
+import { MobileLaptop } from "@/components/hero/MobileLaptop";
 import { Button } from "@/components/ui/button";
 
 // O SimpleStock é a prova ao lado do nome: o notebook já abre no dashboard, e os
@@ -56,6 +57,8 @@ export function Hero() {
               </div>
             </Laptop>
             <FrontCards />
+            {/* Celular: o mesmo notebook em WebGL, com luz e volume de verdade. */}
+            <MobileLaptop />
           </div>
           <figcaption className="hero__caption t-small text-muted-foreground">
             SimpleStock, sistema de estoque com React, Express e PostgreSQL.{" "}
