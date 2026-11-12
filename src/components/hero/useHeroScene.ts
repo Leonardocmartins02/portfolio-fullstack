@@ -16,8 +16,8 @@ import type { HeroMotion } from "@/components/hero/LaptopScene";
 //
 // Sem WebGL (data-webgl="off"), os cards chegam pela animação CSS e a rolagem
 // só os recolhe para o notebook CSS, como antes. Com movimento reduzido nada
-// disso roda e a cena fica no estado inicial. No celular os cards saem do
-// palco e ficam em fila: não se movem.
+// disso roda e a cena fica no estado inicial. A mesma coreografia vale do
+// celular ao desktop; só o palco muda de forma no CSS.
 
 const TILT_X = 2;
 const TILT_Y = 3;
@@ -138,11 +138,9 @@ export function useHeroScene(
       measure(frameInfo) {
         start = section.getBoundingClientRect().top + frameInfo.scrollY;
         const shortScreen = frameInfo.viewportHeight <= 740 && window.innerWidth < 1024;
-        const wide = window.innerWidth >= 640;
-        // Do tablet para cima a seção fica presa por mais tempo (CSS: .hero::after),
-        // para caber a história inteira: cards entrando e tampa fechando.
-        const share = shortScreen ? 0.25 : wide ? 0.75 : 0.4;
-        span = Math.min(wide ? 760 : 360, frameInfo.viewportHeight * share);
+        // A seção fica presa por 80svh (CSS: .hero::after) para caber a história
+        // inteira: cards entrando e tampa fechando. Em tela baixa, sem prender.
+        span = Math.min(760, frameInfo.viewportHeight * (shortScreen ? 0.25 : 0.75));
         // Caixas de layout (sem transform) relativas ao palco: o alvo é o centro da tela.
         const targetX = laptop.offsetLeft + laptop.offsetWidth / 2;
         const targetY = laptop.offsetTop + laptop.offsetHeight * 0.42;

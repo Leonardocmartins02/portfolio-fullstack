@@ -40,13 +40,12 @@ export type DragState = { target: number; current: number; active: boolean };
  */
 export type HeroMotion = { x: number; y: number; progress: number; entry: number | null };
 export type SceneLayout = "mobile" | "wide";
-const NO_MOTION: HeroMotion = { x: 0, y: 0, progress: 0, entry: null };
 
-// Câmera por layout. Celular: faixa larga só para o notebook. Tablet e
-// desktop: o canvas cobre o palco (10:7), e o notebook ocupa o lugar do antigo
-// notebook CSS, com os cards em volta.
+// Câmera por layout. O canvas cobre o palco e o notebook fica no lugar do
+// notebook CSS, com os cards em volta. Celular: palco quase quadrado, notebook
+// menor para os cards caberem nos cantos. Tablet e desktop: palco 10:7.
 const CAMERAS: Record<SceneLayout, { position: [number, number, number]; target: [number, number, number] }> = {
-  mobile: { position: [0, 2.0, 5.5], target: [0, 0.72, 0] },
+  mobile: { position: [0, 2.6, 8.4], target: [0, 0.78, 0] },
   wide: { position: [0, 2.3, 7.2], target: [0, 0.82, 0] },
 };
 
@@ -222,8 +221,8 @@ function Laptop({
     if (!drag.active) drag.target = 0;
     drag.current = THREE.MathUtils.damp(drag.current, drag.target, drag.active ? 14 : 4, delta);
 
-    // Mouse e rolagem só do tablet para cima: o celular fica como foi aprovado.
-    const motion = layout === "wide" ? motionRef.current : NO_MOTION;
+    // Mouse (só onde há mouse) e rolagem, em qualquer largura.
+    const motion = motionRef.current;
     const f = follow.current;
     f.x = THREE.MathUtils.damp(f.x, motion.x, 8, delta);
     f.y = THREE.MathUtils.damp(f.y, motion.y, 8, delta);

@@ -10,8 +10,8 @@ import type { DragState, HeroMotion } from "@/components/hero/LaptopScene";
 // em CSS 3D.
 const LaptopScene = dynamic(() => import("@/components/hero/LaptopScene"), { ssr: false });
 
-// Celular: a cena fica sozinha numa faixa em cima dos cards. Do tablet para
-// cima: o canvas cobre o palco e os cards ficam em volta, em HTML.
+// O canvas cobre o palco e os cards ficam em volta, em HTML; o celular só
+// muda a câmera (palco quase quadrado).
 const MOBILE = "(max-width: 639px)";
 // Mouse: o notebook segue o ponteiro (useHeroScene). Toque: arrastar de lado gira.
 const FINE = "(hover: hover) and (pointer: fine)";

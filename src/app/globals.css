@@ -721,11 +721,11 @@ h3 {
     .stock-card__body { animation: hero-arrive 700ms var(--ease-out) 480ms both; }
   }
 
-  /* Do tablet para cima, com WebGL, os cards fazem parte da coreografia do
+  /* Com WebGL, os cards fazem parte da coreografia do
      notebook (useHeroScene): começam escondidos e saem da tela quando a tampa
      abre; na rolagem, voltam para ela e a tampa fecha. A seção fica presa por
      mais tempo para caber a história inteira. Sem WebGL, vale a chegada acima. */
-  @media (prefers-reduced-motion: no-preference) and (min-width: 640px) {
+  @media (prefers-reduced-motion: no-preference) {
     .js .hero::after { height: 80svh; }
     .js .hero__scene:not([data-webgl="off"]) .stock-card { opacity: 0; }
     .js .hero__scene:not([data-webgl="off"]) .stock-card__body { animation: none; }
@@ -777,37 +777,31 @@ h3 {
     }
   }
 
-  /* Celular: notebook quase de frente e dois cards planos, em fila, embaixo. */
+  /* Celular: a mesma cena do desktop, num palco quase quadrado. O notebook no
+     meio e três cards nos cantos, menores, na mesma coreografia (useHeroScene). */
   @media (max-width: 639px) {
     .hero__copy { grid-template-columns: 1fr; gap: 16px; }
     .hero__aside { justify-self: start; gap: 16px; }
     .hero__aside .t-lead { font-size: 18px; }
 
     .hero__scene {
-      --w: 78cqw;
+      --w: 70cqw;
       --cam-x: -10deg;
       --cam-y: -6deg;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      align-items: start;
-      aspect-ratio: auto;
-      padding-top: 70cqw;
+      aspect-ratio: 1 / 1.2;
     }
 
-    .laptop-view { bottom: auto; height: 70cqw; }
-    .laptop { top: 2cqw; }
+    .laptop { top: 25%; }
 
-    .stock-card[data-card="units"] { display: none; }
-
-    .stock-card[data-card] {
-      position: static;
-      width: auto;
-    }
+    /* Um card em cima e dois embaixo: encostam nas bordas do notebook, sem
+       cobrir a tela. */
+    .stock-card { width: 47cqw; }
+    .stock-card[data-card="units"] { top: 0; left: 0; }
+    .stock-card[data-card="restock"] { top: auto; bottom: 3%; left: 0; }
+    .stock-card[data-card="moves"] { top: auto; bottom: 0; right: 0; left: auto; }
 
     .stock-card__body {
       gap: 8px;
-      height: 100%;
       padding: 12px;
       border-radius: 12px;
       font-size: 12px;
@@ -822,8 +816,7 @@ h3 {
   /* Notebook em WebGL (hero/HeroLaptop.tsx) no lugar do notebook CSS. Do
      tablet para cima, o canvas cobre o palco e passa um pouco das bordas (para
      o notebook girar sem cortar), entre o card de trás e os da frente. No
-     celular, fica na faixa de cima do palco (70cqw), vazando até as bordas da
-     tela. Enquanto o three.js carrega, fica só a luz verde do palco; o notebook
+     celular, vaza até as bordas da tela. Enquanto o three.js carrega, fica só a luz verde do palco; o notebook
      CSS volta se não houver WebGL (data-webgl="off"). */
   .hero__webgl {
     position: absolute;
@@ -862,14 +855,9 @@ h3 {
   }
 
   @media (max-width: 639px) {
+    /* Vaza até as bordas da tela, para o notebook girar sem cortar. */
     .hero__webgl {
-      inset: 0 calc(-1 * var(--margin)) auto;
-      height: 70cqw;
-    }
-
-    .hero__webgl::before {
-      inset: 18% 8% 0;
-      background: radial-gradient(ellipse 50% 42% at 50% 72%, rgb(0 237 100 / 0.13), transparent 70%);
+      inset: 0 calc(-1 * var(--margin));
     }
   }
 
