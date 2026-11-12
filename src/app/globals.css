@@ -721,6 +721,25 @@ h3 {
     .stock-card__body { animation: hero-arrive 700ms var(--ease-out) 480ms both; }
   }
 
+  /* Com WebGL, os cards fazem parte da coreografia do
+     notebook (useHeroScene): começam escondidos e saem da tela quando a tampa
+     abre; na rolagem, voltam para ela e a tampa fecha. A seção fica presa por
+     mais tempo para caber a história inteira. Sem WebGL, vale a chegada acima. */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .hero::after { height: 80svh; }
+  }
+
+  /* Celular: história mais longa na rolagem (o dedo anda mais que a roda). O
+     topo do palco preso vem do useHeroScene, para a cena caber inteira. */
+  @media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
+    .js .hero::after { height: 120svh; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .hero__scene:not([data-webgl="off"]) .stock-card { opacity: 0; }
+    .js .hero__scene:not([data-webgl="off"]) .stock-card__body { animation: none; }
+  }
+
   @keyframes hero-arrive {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -767,93 +786,92 @@ h3 {
     }
   }
 
-  /* Celular: notebook quase de frente e dois cards planos, em fila, embaixo. */
+  /* Celular: a mesma cena do desktop, num palco quase quadrado. O notebook no
+     meio e três cards nos cantos, menores, na mesma coreografia (useHeroScene). */
   @media (max-width: 639px) {
     .hero__copy { grid-template-columns: 1fr; gap: 16px; }
     .hero__aside { justify-self: start; gap: 16px; }
     .hero__aside .t-lead { font-size: 18px; }
 
     .hero__scene {
-      --w: 78cqw;
+      --w: 70cqw;
       --cam-x: -10deg;
       --cam-y: -6deg;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      align-items: start;
-      aspect-ratio: auto;
-      padding-top: 70cqw;
+      aspect-ratio: 1 / 1.12;
     }
 
-    .laptop-view { bottom: auto; height: 70cqw; }
-    .laptop { top: 2cqw; }
+    .laptop { top: 22%; }
 
-    .stock-card[data-card="units"] { display: none; }
-
-    .stock-card[data-card] {
-      position: static;
-      width: auto;
-    }
+    /* Um card em cima e dois embaixo, compactos: encostam nas bordas do
+       notebook sem disputar com a tela. */
+    .stock-card { width: 36cqw; }
+    .stock-card[data-card="units"] { top: 1%; left: 0; }
+    .stock-card[data-card="restock"] { top: auto; bottom: 4%; left: 0; }
+    .stock-card[data-card="moves"] { top: auto; bottom: 0; right: 0; left: auto; }
 
     .stock-card__body {
-      gap: 8px;
-      height: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 12px;
+      gap: 5px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 10px;
+      line-height: 1.3;
     }
 
-    .stock-card__chip { width: 26px; height: 26px; border-radius: 8px; }
-    .stock-card__icon { width: 15px; height: 15px; }
-    .stock-card__value { font-size: 22px; }
-    .stock-card__foot { font-size: 12px; }
+    .stock-card__chip { width: 20px; height: 20px; border-radius: 6px; }
+    .stock-card__icon { width: 12px; height: 12px; }
+    .stock-card__value { font-size: 17px; }
+    .stock-card__foot { gap: 3px 6px; font-size: 10px; }
   }
 
-  /* Celular: notebook em WebGL (hero/MobileLaptop.tsx) no lugar do notebook
-     CSS, na mesma faixa do palco (70cqw), vazando até as bordas da tela para
-     ter espaço ao girar. Enquanto o three.js carrega, fica só a luz verde do
-     palco; o notebook CSS volta se não houver WebGL (data-webgl="off"). */
+  /* Notebook em WebGL (hero/HeroLaptop.tsx) no lugar do notebook CSS. Do
+     tablet para cima, o canvas cobre o palco e passa um pouco das bordas (para
+     o notebook girar sem cortar), entre o card de trás e os da frente. No
+     celular, vaza até as bordas da tela. Enquanto o three.js carrega, fica só a luz verde do palco; o notebook
+     CSS volta se não houver WebGL (data-webgl="off"). */
   .hero__webgl {
-    display: none;
+    position: absolute;
+    inset: -4% -6% -2%;
+    /* Mouse: quem move o notebook é o ponteiro na seção (useHeroScene). */
+    pointer-events: none;
+  }
+
+  /* Toque: arrastar de lado gira; na vertical, a página rola. */
+  .hero__webgl[data-drag] {
+    pointer-events: auto;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .hero__webgl::before {
+    content: "";
+    position: absolute;
+    inset: 12% 10% 6%;
+    background: radial-gradient(ellipse 50% 42% at 50% 62%, rgb(0 237 100 / 0.11), transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero__webgl canvas {
+    opacity: 0;
+    transition: opacity 300ms var(--ease-out);
+  }
+
+  .hero__scene[data-webgl="ready"] .hero__webgl canvas {
+    opacity: 1;
+  }
+
+  .js .hero__scene:not([data-webgl="off"]) .laptop-view {
+    visibility: hidden;
   }
 
   @media (max-width: 639px) {
+    /* Vaza até as bordas da tela, para o notebook girar sem cortar. */
     .hero__webgl {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: calc(-1 * var(--margin));
-      right: calc(-1 * var(--margin));
-      height: 70cqw;
-      /* O dedo na vertical rola a página; na horizontal, gira o notebook. */
-      touch-action: pan-y;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    .hero__webgl::before {
-      content: "";
-      position: absolute;
-      inset: 18% 8% 0;
-      background: radial-gradient(ellipse 50% 42% at 50% 72%, rgb(0 237 100 / 0.13), transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero__webgl canvas {
-      opacity: 0;
-      transition: opacity 300ms var(--ease-out);
-    }
-
-    .hero__scene[data-webgl="ready"] .hero__webgl canvas {
-      opacity: 1;
-    }
-
-    .js .hero__scene:not([data-webgl="off"]) .laptop-view {
-      visibility: hidden;
+      inset: 0 calc(-1 * var(--margin));
     }
   }
 
-  @media (max-height: 740px) and (max-width: 1023px) {
+  @media (max-height: 740px) and (min-width: 640px) and (max-width: 1023px) {
     .js .hero::after { display: none; }
     .js .hero__stage { position: relative; top: auto; }
   }
