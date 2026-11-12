@@ -797,29 +797,30 @@ h3 {
       --w: 70cqw;
       --cam-x: -10deg;
       --cam-y: -6deg;
-      aspect-ratio: 1 / 1.2;
+      aspect-ratio: 1 / 1.12;
     }
 
-    .laptop { top: 25%; }
+    .laptop { top: 22%; }
 
-    /* Um card em cima e dois embaixo: encostam nas bordas do notebook, sem
-       cobrir a tela. */
-    .stock-card { width: 47cqw; }
-    .stock-card[data-card="units"] { top: 0; left: 0; }
-    .stock-card[data-card="restock"] { top: auto; bottom: 3%; left: 0; }
+    /* Um card em cima e dois embaixo, compactos: encostam nas bordas do
+       notebook sem disputar com a tela. */
+    .stock-card { width: 36cqw; }
+    .stock-card[data-card="units"] { top: 1%; left: 0; }
+    .stock-card[data-card="restock"] { top: auto; bottom: 4%; left: 0; }
     .stock-card[data-card="moves"] { top: auto; bottom: 0; right: 0; left: auto; }
 
     .stock-card__body {
-      gap: 8px;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 12px;
+      gap: 5px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 10px;
+      line-height: 1.3;
     }
 
-    .stock-card__chip { width: 26px; height: 26px; border-radius: 8px; }
-    .stock-card__icon { width: 15px; height: 15px; }
-    .stock-card__value { font-size: 22px; }
-    .stock-card__foot { font-size: 12px; }
+    .stock-card__chip { width: 20px; height: 20px; border-radius: 6px; }
+    .stock-card__icon { width: 12px; height: 12px; }
+    .stock-card__value { font-size: 17px; }
+    .stock-card__foot { gap: 3px 6px; font-size: 10px; }
   }
 
   /* Notebook em WebGL (hero/HeroLaptop.tsx) no lugar do notebook CSS. Do
