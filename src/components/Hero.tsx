@@ -9,7 +9,8 @@ import { useMediaQuery, useReducedMotion } from "@/lib/scroll-orchestrator";
 import { Laptop } from "@/components/hero/Laptop";
 import { BackCards, FrontCards } from "@/components/hero/StockCards";
 import { useHeroScene } from "@/components/hero/useHeroScene";
-import { MobileLaptop } from "@/components/hero/MobileLaptop";
+import { HeroLaptop } from "@/components/hero/HeroLaptop";
+import type { HeroMotion } from "@/components/hero/LaptopScene";
 import { Button } from "@/components/ui/button";
 
 // O SimpleStock é a prova ao lado do nome: o notebook já abre no dashboard, e os
@@ -21,8 +22,10 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const laptopRef = useRef<HTMLDivElement>(null);
+  // Mouse e rolagem do hero, lidos pelo notebook em WebGL a cada quadro.
+  const motionRef = useRef<HeroMotion>({ x: 0, y: 0, progress: 0 });
 
-  useHeroScene(sectionRef, sceneRef, laptopRef, { enabled: !reducedMotion, finePointer });
+  useHeroScene(sectionRef, sceneRef, laptopRef, motionRef, { enabled: !reducedMotion, finePointer });
 
   return (
     <section ref={sectionRef} id="inicio" data-chapter="dark" className="hero chapter chapter-dark">
@@ -56,9 +59,11 @@ export function Hero() {
                 />
               </div>
             </Laptop>
+            {/* O mesmo notebook em WebGL, com luz e volume de verdade. Fica entre
+                o card de trás e os da frente; o notebook CSS acima é o reserva
+                sem WebGL (e guarda o print da tela para leitores de tela). */}
+            <HeroLaptop motionRef={motionRef} />
             <FrontCards />
-            {/* Celular: o mesmo notebook em WebGL, com luz e volume de verdade. */}
-            <MobileLaptop />
           </div>
           <figcaption className="hero__caption t-small text-muted-foreground">
             SimpleStock, sistema de estoque com React, Express e PostgreSQL.{" "}

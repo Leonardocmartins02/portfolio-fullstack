@@ -1,11 +1,15 @@
-import { useEffect, type RefObject } from "react";
+import { useEffect, type MutableRefObject, type RefObject } from "react";
 import { registerScrollController } from "@/lib/scroll-orchestrator";
+import type { HeroMotion } from "@/components/hero/LaptopScene";
 
 // Movimento da cena do hero, sempre em transform escrito em cada elemento:
 // - rolagem: no trecho em que o hero fica preso, os cards se recolhem para a tela
 //   do notebook (os módulos entrando no sistema);
 // - ponteiro fino: o notebook inclina até 2°/3° e os cards se deslocam conforme a
 //   profundidade (o que está à frente anda com o ponteiro, o de trás ao contrário).
+// O ponteiro suavizado e o progresso da rolagem também vão para o motionRef, que
+// o notebook em WebGL lê a cada quadro (inclina com o mouse, vira de frente
+// enquanto os cards entram na tela).
 // Com movimento reduzido nada disso roda e a cena fica no estado inicial.
 
 const TILT_X = 2;
@@ -22,12 +26,14 @@ export function useHeroScene(
   sectionRef: RefObject<HTMLElement>,
   sceneRef: RefObject<HTMLElement>,
   laptopRef: RefObject<HTMLElement>,
+  motionRef: MutableRefObject<HeroMotion>,
   { enabled, finePointer }: { enabled: boolean; finePointer: boolean },
 ) {
   useEffect(() => {
     const section = sectionRef.current;
     const scene = sceneRef.current;
     const laptop = laptopRef.current;
+    const motion = motionRef.current;
     if (!enabled || !section || !scene || !laptop) return;
 
     const cards = Array.from(scene.querySelectorAll<HTMLElement>(".stock-card"));
@@ -40,6 +46,9 @@ export function useHeroScene(
     let pointerFrame = 0;
 
     function paint() {
+      motion.x = pointer.x;
+      motion.y = pointer.y;
+      motion.progress = Math.max(0, progress);
       laptop!.style.transform = `rotateX(${-pointer.y * TILT_X}deg) rotateY(${pointer.x * TILT_Y}deg)`;
       cards.forEach((card, i) => {
         const vector = toward[i];
@@ -121,11 +130,12 @@ export function useHeroScene(
       section.removeEventListener("pointerleave", onLeave);
       if (pointerFrame) cancelAnimationFrame(pointerFrame);
       laptop.style.removeProperty("transform");
+      Object.assign(motion, { x: 0, y: 0, progress: 0 });
       for (const card of cards) {
         card.style.removeProperty("translate");
         card.style.removeProperty("scale");
         card.style.removeProperty("opacity");
       }
     };
-  }, [enabled, finePointer, sectionRef, sceneRef, laptopRef]);
+  }, [enabled, finePointer, sectionRef, sceneRef, laptopRef, motionRef]);
 }

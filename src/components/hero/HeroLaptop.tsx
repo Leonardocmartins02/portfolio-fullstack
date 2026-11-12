@@ -1,16 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MutableRefObject, type PointerEvent } from "react";
 import dynamic from "next/dynamic";
 import { useMediaQuery, useReducedMotion } from "@/lib/scroll-orchestrator";
-import type { DragState } from "@/components/hero/LaptopScene";
+import type { DragState, HeroMotion } from "@/components/hero/LaptopScene";
 
-// O three.js (~200 kB) só é baixado quando este componente decide montar a
-// cena: celular (abaixo de 640px) com WebGL. No desktop e no tablet nada muda
-// e nada novo é baixado.
+// Notebook do hero em WebGL, em qualquer largura. O three.js (~200 kB) só é
+// baixado quando o navegador tem WebGL; sem ele (ou com erro), fica o notebook
+// em CSS 3D.
 const LaptopScene = dynamic(() => import("@/components/hero/LaptopScene"), { ssr: false });
 
+// Celular: a cena fica sozinha numa faixa em cima dos cards. Do tablet para
+// cima: o canvas cobre o palco e os cards ficam em volta, em HTML.
 const MOBILE = "(max-width: 639px)";
+// Mouse: o notebook segue o ponteiro (useHeroScene). Toque: arrastar de lado gira.
+const FINE = "(hover: hover) and (pointer: fine)";
 // Quanto o notebook gira por pixel arrastado, e o limite (rad).
 const DRAG_SPEED = 0.008;
 const DRAG_LIMIT = 1.1;
@@ -25,10 +29,11 @@ function hasWebGL() {
 }
 
 // Estado na própria cena (.hero__scene[data-webgl]), lido pelo CSS:
-// sem atributo (carregando) e "ready" escondem o notebook CSS no celular;
+// sem atributo (carregando) e "ready" escondem o notebook CSS;
 // "off" (sem WebGL, ou erro) devolve o notebook CSS.
-export function MobileLaptop() {
+export function HeroLaptop({ motionRef }: { motionRef: MutableRefObject<HeroMotion> }) {
   const mobile = useMediaQuery(MOBILE);
+  const fine = useMediaQuery(FINE);
   const still = useReducedMotion();
   const wrapRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragState>({ target: 0, current: 0, active: false });
@@ -38,6 +43,7 @@ export function MobileLaptop() {
   // Movimento reduzido: só renderiza enquanto o dedo arrasta e a volta assenta.
   const [interacting, setInteracting] = useState(false);
   const settleTimer = useRef<number>(0);
+  const draggable = !fine;
 
   const setSceneState = useCallback((state: "ready" | "off" | null) => {
     const scene = wrapRef.current?.parentElement;
@@ -47,22 +53,21 @@ export function MobileLaptop() {
   }, []);
 
   useEffect(() => {
-    if (!mobile) return;
     const ok = hasWebGL();
     setSupported(ok);
     if (!ok) setSceneState("off");
-  }, [mobile, setSceneState]);
+  }, [setSceneState]);
 
   // Fora da tela, o laço de render para.
   useEffect(() => {
     const wrap = wrapRef.current;
-    if (!wrap || !mobile) return;
+    if (!wrap || supported === false) return;
     const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), {
       rootMargin: "120px 0px",
     });
     observer.observe(wrap);
     return () => observer.disconnect();
-  }, [mobile]);
+  }, [supported]);
 
   useEffect(() => () => setSceneState(null), [setSceneState]);
 
@@ -71,6 +76,7 @@ export function MobileLaptop() {
   // Arrasto de lado gira o notebook; o vertical continua rolando a página
   // (touch-action: pan-y no CSS, e o navegador cancela o ponteiro ao rolar).
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (!draggable) return;
     pointer.current = { id: event.pointerId, x: event.clientX };
     dragRef.current.active = true;
     window.clearTimeout(settleTimer.current);
@@ -91,12 +97,13 @@ export function MobileLaptop() {
 
   useEffect(() => () => window.clearTimeout(settleTimer.current), []);
 
-  if (!mobile || supported === false) return null;
+  if (supported === false) return null;
 
   return (
     <div
       ref={wrapRef}
       className="hero__webgl"
+      data-drag={draggable ? "" : undefined}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={release}
@@ -105,7 +112,9 @@ export function MobileLaptop() {
     >
       {supported ? (
         <LaptopScene
+          layout={mobile ? "mobile" : "wide"}
           dragRef={dragRef}
+          motionRef={motionRef}
           still={still}
           frameloop={!visible ? "never" : still && !interacting ? "demand" : "always"}
           onReady={onReady}
