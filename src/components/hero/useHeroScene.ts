@@ -26,14 +26,12 @@ const SHIFT_X = 0.07;
 const SHIFT_Y = 0.05;
 // Fração do caminho que o ponteiro suavizado anda por quadro.
 const EASE = 0.12;
-// Scrub: o progresso alcança a rolagem com ~0,4 s de atraso (~0,6 s no
-// celular, onde o dedo joga a página com impulso).
-const SCRUB = 9;
-const SCRUB_TOUCH = 5;
-// Rolagem para a história inteira, em alturas de tela (svh). No celular ela é
-// mais longa: o mesmo gesto do dedo anda bem mais que a roda do mouse.
-const STORY = 0.75;
-const STORY_MOBILE = 1.1;
+// Scrub: o progresso alcança a rolagem com ~0,6 s de atraso, macio tanto no
+// impulso do dedo quanto nos degraus da roda do mouse.
+const SCRUB = 5;
+// Rolagem para a história inteira, em alturas de tela (svh), com teto em px.
+const STORY = 1.1;
+const STORY_MAX = 1100;
 
 // Entrada dos cards, em segundos do relógio da cena (a tela acende em 1,25–1,85).
 const CARD_START = 1.45;
@@ -79,7 +77,7 @@ export function useHeroScene(
     const mountedAt = performance.now();
     let start = 0;
     let span = 1;
-    let scrub = SCRUB;
+
     let target = 0; // progresso da rolagem (cru)
     let progress = 0; // progresso suavizado (scrub)
     let visible = true;
@@ -128,7 +126,7 @@ export function useHeroScene(
       last = now;
       pointer.x += (pointer.targetX - pointer.x) * EASE;
       pointer.y += (pointer.targetY - pointer.y) * EASE;
-      progress += (target - progress) * (1 - Math.exp(-scrub * delta));
+      progress += (target - progress) * (1 - Math.exp(-SCRUB * delta));
       if (Math.abs(target - progress) < 0.0005) progress = target;
       paint(now);
       frame = visible ? requestAnimationFrame(tick) : 0;
@@ -146,7 +144,6 @@ export function useHeroScene(
       measure(frameInfo) {
         const mobile = window.innerWidth < 640;
         const screen = frameInfo.smallViewportHeight;
-        scrub = mobile ? SCRUB_TOUCH : SCRUB;
         // Celular: o palco é mais alto que a tela (o texto em cima da cena). Ele
         // rola até a cena e a legenda caberem inteiras e só então fica preso:
         // o texto sai primeiro e a história acontece com a cena toda à vista.
@@ -160,9 +157,9 @@ export function useHeroScene(
         // Tablet em tela baixa: a cena não cabe, então a seção não fica presa
         // (CSS) e a história acontece num trecho curto.
         const shortScreen = !mobile && screen <= 740 && window.innerWidth < 1024;
-        // A seção fica presa (CSS: .hero::after, 80svh; 120svh no celular) para
-        // caber a história inteira: cards entrando e tampa fechando.
-        span = shortScreen ? screen * 0.25 : Math.min(mobile ? 1100 : 760, screen * (mobile ? STORY_MOBILE : STORY));
+        // A seção fica presa (CSS: .hero::after, 120svh) para caber a história
+        // inteira, devagar: cards entrando e tampa fechando.
+        span = shortScreen ? screen * 0.25 : Math.min(STORY_MAX, screen * STORY);
         // Caixas de layout (sem transform) relativas ao palco: o alvo é o centro da tela.
         const targetX = laptop.offsetLeft + laptop.offsetWidth / 2;
         const targetY = laptop.offsetTop + laptop.offsetHeight * 0.42;
