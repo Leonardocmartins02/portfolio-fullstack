@@ -727,6 +727,15 @@ h3 {
      mais tempo para caber a história inteira. Sem WebGL, vale a chegada acima. */
   @media (prefers-reduced-motion: no-preference) {
     .js .hero::after { height: 80svh; }
+  }
+
+  /* Celular: história mais longa na rolagem (o dedo anda mais que a roda). O
+     topo do palco preso vem do useHeroScene, para a cena caber inteira. */
+  @media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
+    .js .hero::after { height: 120svh; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
     .js .hero__scene:not([data-webgl="off"]) .stock-card { opacity: 0; }
     .js .hero__scene:not([data-webgl="off"]) .stock-card__body { animation: none; }
   }
@@ -861,7 +870,7 @@ h3 {
     }
   }
 
-  @media (max-height: 740px) and (max-width: 1023px) {
+  @media (max-height: 740px) and (min-width: 640px) and (max-width: 1023px) {
     .js .hero::after { display: none; }
     .js .hero__stage { position: relative; top: auto; }
   }
