@@ -725,13 +725,9 @@ h3 {
      notebook (useHeroScene): começam escondidos e saem da tela quando a tampa
      abre; na rolagem, voltam para ela e a tampa fecha. A seção fica presa por
      mais tempo para caber a história inteira. Sem WebGL, vale a chegada acima. */
+  /* No celular, o topo do palco preso vem do useHeroScene, para a cena caber
+     inteira. */
   @media (prefers-reduced-motion: no-preference) {
-    .js .hero::after { height: 80svh; }
-  }
-
-  /* Celular: história mais longa na rolagem (o dedo anda mais que a roda). O
-     topo do palco preso vem do useHeroScene, para a cena caber inteira. */
-  @media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
     .js .hero::after { height: 120svh; }
   }
 
