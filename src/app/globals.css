@@ -721,6 +721,16 @@ h3 {
     .stock-card__body { animation: hero-arrive 700ms var(--ease-out) 480ms both; }
   }
 
+  /* Do tablet para cima, com WebGL, os cards fazem parte da coreografia do
+     notebook (useHeroScene): começam escondidos e saem da tela quando a tampa
+     abre; na rolagem, voltam para ela e a tampa fecha. A seção fica presa por
+     mais tempo para caber a história inteira. Sem WebGL, vale a chegada acima. */
+  @media (prefers-reduced-motion: no-preference) and (min-width: 640px) {
+    .js .hero::after { height: 80svh; }
+    .js .hero__scene:not([data-webgl="off"]) .stock-card { opacity: 0; }
+    .js .hero__scene:not([data-webgl="off"]) .stock-card__body { animation: none; }
+  }
+
   @keyframes hero-arrive {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }

@@ -23,7 +23,7 @@ export function Hero() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const laptopRef = useRef<HTMLDivElement>(null);
   // Mouse e rolagem do hero, lidos pelo notebook em WebGL a cada quadro.
-  const motionRef = useRef<HeroMotion>({ x: 0, y: 0, progress: 0 });
+  const motionRef = useRef<HeroMotion>({ x: 0, y: 0, progress: 0, entry: null });
 
   useHeroScene(sectionRef, sceneRef, laptopRef, motionRef, { enabled: !reducedMotion, finePointer });
 

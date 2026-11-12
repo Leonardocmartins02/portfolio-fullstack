@@ -14,8 +14,10 @@ import { Environment, Lightformer, RoundedBox, useTexture } from "@react-three/d
 // Movimento, só em transform: a tampa abre na dobradiça e a tela acende; depois
 // o notebook flutua e balança devagar. O dedo arrastado de lado gira o
 // notebook, que volta com inércia (dragRef vem do HeroLaptop). Do tablet para
-// cima, o notebook também segue o mouse e, na rolagem em que os cards entram na
-// tela, vira de frente (motionRef, escrito pelo useHeroScene).
+// cima, a cena faz parte da coreografia do useHeroScene (motionRef): segue o
+// mouse e, na rolagem, vira de frente enquanto os cards entram na tela, apaga a
+// tela e fecha a tampa; rolando de volta, abre de novo. O relógio da entrada
+// volta pelo motionRef.entry, para os cards saírem da tela na hora certa.
 
 // Medidas em unidades de cena (1 ≈ 10 cm de um notebook de 14").
 const BASE = { w: 3.2, h: 0.11, d: 2.2 };
@@ -32,10 +34,13 @@ const SCREEN_SRC = `/_next/image?url=${encodeURIComponent("/projects/simplestock
 const ALUMINUM = { color: "#9aa3ae", metalness: 0.82, roughness: 0.3 } as const;
 
 export type DragState = { target: number; current: number; active: boolean };
-/** Ponteiro (-1 a 1, já suavizado) e progresso da rolagem do hero (0 a 1). */
-export type HeroMotion = { x: number; y: number; progress: number };
+/**
+ * Ponteiro (-1 a 1, já suavizado), progresso da rolagem do hero (0 a 1, com
+ * scrub) e o relógio da entrada da cena (s; null até o notebook aparecer).
+ */
+export type HeroMotion = { x: number; y: number; progress: number; entry: number | null };
 export type SceneLayout = "mobile" | "wide";
-const NO_MOTION: HeroMotion = { x: 0, y: 0, progress: 0 };
+const NO_MOTION: HeroMotion = { x: 0, y: 0, progress: 0, entry: null };
 
 // Câmera por layout. Celular: faixa larga só para o notebook. Tablet e
 // desktop: o canvas cobre o palco (10:7), e o notebook ocupa o lugar do antigo
@@ -48,7 +53,14 @@ const CAMERAS: Record<SceneLayout, { position: [number, number, number]; target:
 // Inclinação máxima pelo ponteiro (rad) e quanto a rolagem vira para a frente.
 const POINTER_YAW = 0.24;
 const POINTER_PITCH = 0.08;
-const SCROLL_YAW = 0.24;
+const SCROLL_YAW = 0.28;
+
+// Fases da rolagem (progresso 0 a 1), as mesmas do useHeroScene: os cards
+// entram na tela até 0,55; a tela apaga em 0,45–0,65; a tampa fecha em 0,5–0,95.
+const TURN_END = 0.5;
+const DIM = [0.45, 0.65] as const;
+const CLOSE = [0.5, 0.95] as const;
+const easeInOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
@@ -199,14 +211,12 @@ function Laptop({
     else if (frames.current < 2) state.invalidate();
     if (frames.current > 2) elapsed.current += Math.min(delta, 1 / 30);
     const t = still ? 10 : elapsed.current;
+    if (frames.current > 2) motionRef.current.entry = t;
 
     // Entrada: sobe e cresce (0–0,9s), a tampa abre (0,4–1,9s), a tela acende (1,25–1,85s).
     const rise = easeOutCubic(clamp01(t / 0.9));
     const open = easeOutBack(clamp01((t - 0.4) / 1.5));
     const glow = easeOutCubic(clamp01((t - 1.25) / 0.6));
-    lid.rotation.x = THREE.MathUtils.lerp(LID_CLOSED, LID_OPEN, open);
-    material.color.setScalar(glow);
-
     // Inércia do arrasto: segue o dedo e volta ao centro quando ele sai.
     const drag = dragRef.current;
     if (!drag.active) drag.target = 0;
@@ -217,14 +227,25 @@ function Laptop({
     const f = follow.current;
     f.x = THREE.MathUtils.damp(f.x, motion.x, 8, delta);
     f.y = THREE.MathUtils.damp(f.y, motion.y, 8, delta);
-    f.progress = THREE.MathUtils.damp(f.progress, motion.progress, 10, delta);
+    // O progresso já vem com scrub; aqui só tira o degrau entre quadros.
+    f.progress = THREE.MathUtils.damp(f.progress, motion.progress, 14, delta);
+    const p = f.progress;
+    const turn = easeInOutCubic(clamp01(p / TURN_END));
+    const dim = clamp01((p - DIM[0]) / (DIM[1] - DIM[0]));
+    const close = easeInOutCubic(clamp01((p - CLOSE[0]) / (CLOSE[1] - CLOSE[0])));
+
+    // A tampa: abre na entrada, fecha com a rolagem. A tela só acende com a
+    // tampa aberta e apaga antes de ela descer.
+    lid.rotation.x = THREE.MathUtils.lerp(LID_CLOSED, LID_OPEN, open * (1 - close));
+    material.color.setScalar(glow * (1 - dim));
 
     // Com o mouse por perto, o balanço fica menor: quem manda é o ponteiro.
     const sway = layout === "wide" ? 0.08 : 0.14;
     const idle = still ? 0 : Math.sin(now * 0.45) * sway;
     const float = still ? 0 : Math.sin(now * 0.9) * 0.045;
-    group.rotation.y = -0.28 + idle + drag.current + f.x * POINTER_YAW + f.progress * SCROLL_YAW;
-    group.rotation.x = -0.04 + (drag.target - drag.current) * 0.08 + f.y * POINTER_PITCH;
+    group.rotation.y = -0.28 + idle + drag.current + f.x * POINTER_YAW + turn * SCROLL_YAW;
+    // Fechando, inclina um pouco para a câmera: a tampa de alumínio aparece.
+    group.rotation.x = -0.04 + (drag.target - drag.current) * 0.08 + f.y * POINTER_PITCH + close * 0.2;
     group.position.y = -0.35 * (1 - rise) + float;
     group.scale.setScalar(0.9 + 0.1 * rise);
   });
