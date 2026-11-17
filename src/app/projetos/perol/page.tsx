@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import {
+  AdVideoGallery,
   CaseStudyIntro,
   CaseStudyNotes,
   CaseStudyPage,
   CaseStudyVideo,
   ScreenGallery,
+  type AdVideo,
   type Screen,
 } from "@/components/case-study";
 
 export const metadata: Metadata = {
   title: "Perol — landing page do F5 Flotador e Lavix | Leonardo Martins",
-  description: "Landing page de dois produtos de limpeza profissional: troca de produto, galeria por volume, kits com preço por litro, guia por ambiente e versão para celular, com React, TanStack Start e Tailwind CSS.",
+  description: "Landing page de dois produtos de limpeza profissional: troca de produto, galeria por volume, kits com preço por litro, guia por ambiente e versão para celular, com React, TanStack Start e Tailwind CSS, mais cinco anúncios em vídeo para a Black Friday.",
 };
 
 const repository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
@@ -41,6 +43,39 @@ const steps = [
   "No celular: escolher volume e kit, com a barra fixa de compra acompanhando a rolagem.",
 ];
 
+const adVideos: AdVideo[] = [
+  {
+    src: "/projects/perol-anuncio-casa.mp4",
+    poster: "/projects/perol-anuncio-casa.jpg",
+    title: "Casa — “Quantos produtos de limpeza tem na sua casa?”",
+    label: "Anúncio Perol para casas: sete frascos caem na tela, o F5 Flotador substitui todos, grandes empresas confiam há 30 anos e oferta de Black Friday na caixa fechada",
+  },
+  {
+    src: "/projects/perol-anuncio-diaristas.mp4",
+    poster: "/projects/perol-anuncio-diaristas.jpg",
+    title: "Diaristas — “Quanto pesa a sua bolsa?”",
+    label: "Anúncio Perol para diaristas: a bolsa cai numa balança que marca pesado, troque cinco por um, grandes empresas confiam e oferta de Black Friday na caixa fechada",
+  },
+  {
+    src: "/projects/perol-anuncio-cozinhas.mp4",
+    poster: "/projects/perol-anuncio-cozinhas.jpg",
+    title: "Cozinhas — “Fim de expediente”",
+    label: "Anúncio Perol para cozinhas profissionais: uma passada limpa o piso, gordura, encardido e sujeira todo dia, grandes empresas confiam e oferta de Black Friday na caixa fechada",
+  },
+  {
+    src: "/projects/perol-anuncio-condominios.mp4",
+    poster: "/projects/perol-anuncio-condominios.jpg",
+    title: "Condomínios — “Quantos produtos sua equipe compra?”",
+    label: "Anúncio Perol para síndicos e gestores: a lista de compras é riscada até sobrar um produto, 30 anos atendendo grandes empresas e oferta de Black Friday na caixa fechada",
+  },
+  {
+    src: "/projects/perol-anuncio-institucional.mp4",
+    poster: "/projects/perol-anuncio-institucional.jpg",
+    title: "Institucional — “Há 30 anos”",
+    label: "Anúncio institucional Perol: 30 anos de mercado, ISO 9001, normas Anvisa e presença no Brasil, tudo começou com o Flotador, e oferta de Black Friday na caixa fechada",
+  },
+];
+
 const notes = [
   {
     title: "Decisões técnicas",
@@ -66,8 +101,8 @@ export default function PerolPage() {
         Página de venda de dois produtos da linha profissional Perol, feita para receber o
         tráfego dos anúncios. Uma página só troca entre o F5 Flotador e o Lavix, com galeria por
         volume, kits com preço por litro, respostas às dúvidas de compra, guia de uso por
-        ambiente e ficha técnica. Fiz tudo: o código e as artes. O marketing e os
-        anúncios ficam com um parceiro.
+        ambiente e ficha técnica. Fiz o código, as artes e os vídeos dos anúncios. O
+        marketing e a veiculação ficam com um parceiro.
       </CaseStudyIntro>
       <CaseStudyVideo
         src="/projects/perol-demo.webm"
@@ -75,6 +110,12 @@ export default function PerolPage() {
         label="Demonstração da landing page Perol: galeria e kits, dúvidas, garantia, guia por ambiente, antes e depois, ficha técnica, troca para o Lavix e versão para celular"
         note="Vídeo sem áudio. O roteiro textual abaixo descreve o fluxo apresentado."
         steps={steps}
+      />
+      <AdVideoGallery
+        title="Anúncios em vídeo"
+        intro="Cinco anúncios verticais para a campanha de Black Friday, cada um falando com um público: casa, diaristas, cozinhas profissionais, condomínios e um institucional. Todos abrem com um gancho visual nos primeiros segundos, mostram o produto, trazem a prova de confiança da marca e fecham na oferta da caixa fechada."
+        note="Vídeos com som. Animação feita em código (HTML renderizado quadro a quadro com Chromium e ffmpeg), narração gerada no ElevenLabs e efeitos sonoros sintetizados. O piso do anúncio de cozinhas é uma imagem ilustrativa."
+        videos={adVideos}
       />
       <CaseStudyNotes notes={notes} />
       <ScreenGallery title="Telas da página" desktop={desktopScreens} mobile={mobileScreens} />
