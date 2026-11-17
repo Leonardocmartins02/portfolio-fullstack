@@ -186,7 +186,7 @@ export function AdVideoGallery({
     <section aria-labelledby="anuncios" className="mt-16 sm:mt-20">
       <CaseStudyHeading id="anuncios">{title}</CaseStudyHeading>
       <p className="t-body mt-4 max-w-[62ch] leading-relaxed text-muted-foreground">{intro}</p>
-      <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+      <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
         {videos.map((video) => (
           <li key={video.src}>
             <figure>
