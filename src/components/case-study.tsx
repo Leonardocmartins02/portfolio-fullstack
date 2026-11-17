@@ -168,6 +168,54 @@ export function CaseStudyVideo({
   );
 }
 
+export type AdVideo = { src: string; poster: string; title: string; label: string };
+
+/** Vídeos verticais (9:16) com som, lado a lado; só baixam ao dar play. */
+export function AdVideoGallery({
+  title,
+  intro,
+  note,
+  videos,
+}: {
+  title: string;
+  intro: ReactNode;
+  note: string;
+  videos: AdVideo[];
+}) {
+  return (
+    <section aria-labelledby="anuncios" className="mt-16 sm:mt-20">
+      <CaseStudyHeading id="anuncios">{title}</CaseStudyHeading>
+      <p className="t-body mt-4 max-w-[62ch] leading-relaxed text-muted-foreground">{intro}</p>
+      <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+        {videos.map((video) => (
+          <li key={video.src}>
+            <figure>
+              <MediaFrame
+                poster={video.poster}
+                className="aspect-[9/16] overflow-hidden rounded-xl border border-border bg-black"
+              >
+                <video
+                  controls
+                  playsInline
+                  preload="none"
+                  poster={video.poster}
+                  className="block size-full object-cover"
+                  aria-label={video.label}
+                >
+                  <source src={video.src} type="video/mp4" />
+                  Seu navegador não reproduz este vídeo. <a href={video.src}>Baixar vídeo</a>.
+                </video>
+              </MediaFrame>
+              <figcaption className="t-small mt-3 text-muted-foreground">{video.title}</figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+      <p className="t-small mt-6 text-muted-foreground">{note}</p>
+    </section>
+  );
+}
+
 export function CaseStudyNotes({ notes }: { notes: { title: string; body: string }[] }) {
   return (
     <div className="mt-16 grid gap-4 sm:mt-20 md:grid-cols-2">
