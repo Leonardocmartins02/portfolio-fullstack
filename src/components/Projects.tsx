@@ -45,7 +45,7 @@ const featured: ProjectPanelData[] = [
     category: "Landing page, front-end",
     fact: "Demonstração em vídeo",
     description:
-      "Página de venda do F5 Flotador e do Lavix para campanhas de anúncio: troca de produto, galeria por volume, kits com preço por litro e guia por ambiente. Fiz o código, as artes e cinco anúncios em vídeo; o marketing e a veiculação ficam com um parceiro.",
+      "Página de venda do F5 Flotador e do Lavix para campanhas de anúncio: troca de produto, galeria por volume, kits com preço por litro e guia por ambiente. Fiz o código, as artes e quatro anúncios em vídeo; o marketing e a veiculação ficam com um parceiro.",
     techs: ["React", "TanStack Start", "Tailwind CSS"],
     image: null,
     url: "perol · F5 Flotador",

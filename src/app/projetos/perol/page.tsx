@@ -12,7 +12,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Perol — landing page do F5 Flotador e Lavix | Leonardo Martins",
-  description: "Landing page de dois produtos de limpeza profissional: troca de produto, galeria por volume, kits com preço por litro, guia por ambiente e versão para celular, com React, TanStack Start e Tailwind CSS, mais cinco anúncios em vídeo para a Black Friday.",
+  description: "Landing page de dois produtos de limpeza profissional: troca de produto, galeria por volume, kits com preço por litro, guia por ambiente e versão para celular, com React, TanStack Start e Tailwind CSS, mais quatro anúncios em vídeo para a Black Friday.",
 };
 
 const repository = "https://github.com/Leonardocmartins02/pixel-perfect-replica";
@@ -49,12 +49,6 @@ const adVideos: AdVideo[] = [
     poster: "/projects/perol-anuncio-casa.jpg",
     title: "Casa — “Quantos produtos de limpeza tem na sua casa?”",
     label: "Anúncio Perol para casas: sete frascos caem na tela, o F5 Flotador substitui todos, grandes empresas confiam há 30 anos e oferta de Black Friday na caixa fechada",
-  },
-  {
-    src: "/projects/perol-anuncio-diaristas.mp4",
-    poster: "/projects/perol-anuncio-diaristas.jpg",
-    title: "Diaristas — “Quanto pesa a sua bolsa?”",
-    label: "Anúncio Perol para diaristas: a bolsa cai numa balança que marca pesado, troque cinco por um, grandes empresas confiam e oferta de Black Friday na caixa fechada",
   },
   {
     src: "/projects/perol-anuncio-cozinhas.mp4",
@@ -113,7 +107,7 @@ export default function PerolPage() {
       />
       <AdVideoGallery
         title="Anúncios em vídeo"
-        intro="Cinco anúncios verticais para a campanha de Black Friday, cada um falando com um público: casa, diaristas, cozinhas profissionais, condomínios e um institucional. Todos abrem com um gancho visual nos primeiros segundos, mostram o produto, trazem a prova de confiança da marca e fecham na oferta da caixa fechada."
+        intro="Quatro anúncios verticais para a campanha de Black Friday, cada um falando com um público: casa, cozinhas profissionais, condomínios e um institucional. Todos abrem com um gancho visual nos primeiros segundos, mostram o produto, trazem a prova de confiança da marca e fecham na oferta da caixa fechada."
         note="Vídeos com som. Animação feita em código (HTML renderizado quadro a quadro com Chromium e ffmpeg), narração gerada no ElevenLabs e efeitos sonoros sintetizados. O piso do anúncio de cozinhas é uma imagem ilustrativa."
         videos={adVideos}
       />
